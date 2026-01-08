@@ -83,27 +83,46 @@ def fit_sbm(
     unique_blocks, block_counts = np.unique(block_array, return_counts=True)
     n_blocks = len(unique_blocks)
     
+    # Remap blocks to 0, 1, ..., n_blocks-1 for consistent indexing
+    block_map = {b: i for i, b in enumerate(unique_blocks)}
+    remapped_blocks = np.array([block_map[b] for b in block_array])
+    
     # Compute block statistics
     block_sizes = {int(b): int(c) for b, c in zip(unique_blocks, block_counts)}
     
-    # Get connection matrix between blocks
-    # This is the expected number of edges between blocks
-    e_rs = best_state.get_matrix()
-    connection_matrix = np.array(e_rs.todense())
+    # Count edges between blocks manually (more reliable than get_matrix)
+    edge_counts = np.zeros((n_blocks, n_blocks))
+    for edge in g.edges():
+        i, j = int(edge.source()), int(edge.target())
+        q_i, q_j = remapped_blocks[i], remapped_blocks[j]
+        # For undirected: count in upper triangle only, then symmetrize
+        if q_i <= q_j:
+            edge_counts[q_i, q_j] += 1
+        else:
+            edge_counts[q_j, q_i] += 1
     
-    # Normalize to get probabilities
+    # Store raw edge counts (symmetric)
+    connection_matrix = edge_counts + edge_counts.T - np.diag(np.diag(edge_counts))
+    
+    # Compute probability matrix: pi_ql = m_ql / max_possible_edges
     n = g.num_vertices()
     block_prob_matrix = np.zeros((n_blocks, n_blocks))
     for r in range(n_blocks):
-        for s in range(n_blocks):
+        for s in range(r, n_blocks):  # Upper triangle + diagonal
             n_r = block_counts[r]
             n_s = block_counts[s]
             if r == s:
+                # Within-block: n_r choose 2
                 max_edges = n_r * (n_r - 1) / 2
             else:
+                # Between-block: n_r * n_s
                 max_edges = n_r * n_s
+            
             if max_edges > 0:
-                block_prob_matrix[r, s] = connection_matrix[r, s] / max_edges
+                # Use edge_counts (upper triangle)
+                pi_rs = edge_counts[r, s] / max_edges
+                block_prob_matrix[r, s] = pi_rs
+                block_prob_matrix[s, r] = pi_rs  # Symmetric
     
     results = {
         'n_blocks': n_blocks,
@@ -111,12 +130,19 @@ def fit_sbm(
         'block_sizes': block_sizes,
         'block_assignment': block_array,
         'connection_matrix': connection_matrix,
-        'connection_probability_matrix': block_prob_matrix
+        'connection_probability_matrix': block_prob_matrix,
+        'edge_counts_between_blocks': edge_counts
     }
     
     print(f"  Optimal blocks: {n_blocks}")
     print(f"  Description length: {best_dl:.2f}")
     print(f"  Block sizes: {list(block_counts)}")
+    
+    # Diagnostic: probability matrix stats
+    pi_vals = block_prob_matrix[block_prob_matrix > 0]
+    if len(pi_vals) > 0:
+        print(f"  Prob matrix: min={pi_vals.min():.4f}, max={pi_vals.max():.4f}, "
+              f"mean={pi_vals.mean():.4f}, non-zero cells={len(pi_vals)}")
     
     return best_state, results
 
