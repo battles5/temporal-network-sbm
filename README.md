@@ -838,6 +838,19 @@ Master's students in Data Science and Statistical Learning (MD2SL)
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
+### Third-Party Licenses
+
+This project depends on the following open-source libraries:
+
+| Library | License | Usage |
+|---------|---------|-------|
+| [graph-tool](https://graph-tool.skewed.de/) | LGPL v3 | Network analysis and SBM inference |
+| [NumPy](https://numpy.org/) | BSD | Numerical computations |
+| [SciPy](https://scipy.org/) | BSD | Scientific computing |
+| [Matplotlib](https://matplotlib.org/) | PSF/BSD | Visualization |
+
+These libraries retain their original licenses. Our MIT license applies only to the original code in this repository.
+
 ---
 
 *Last updated: January 2026*
