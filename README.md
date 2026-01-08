@@ -421,6 +421,8 @@ The 18 blocks likely correspond to **school classes** — the internal density c
 
 ![Block Connection Matrix](docs/sbm_block_matrix.png)
 
+*Figure: Connection Probability Matrix $\hat{\Pi}$, where $\hat{\pi}_{ql}$ represents the estimated probability of an edge between a node in block $q$ and a node in block $\ell$.*
+
 The block connection matrix shows:
 - **Strong diagonal** (assortative structure): students primarily interact within their class
 - **Off-diagonal connections**: inter-class interactions during breaks, lunch, etc.
@@ -457,6 +459,8 @@ The number of detected blocks varies between 1 and 9 across time windows:
 - **High activity periods** (school hours): more blocks detected (5-9)
 
 ![Dynamic SBM Transitions](docs/dynamic_sbm_transitions.png)
+
+*Figure: Transition Probability Matrix $\hat{P}$, where $\hat{p}_{rs} = P(b_{t+1}=s \mid b_t=r)$ represents the estimated probability that a node moves from block $r$ at time $t$ to block $s$ at time $t+1$.*
 
 The transition matrix shows block-to-block movement probabilities. Key observations:
 - **Diagonal dominance**: nodes tend to stay in their blocks (stable class membership)

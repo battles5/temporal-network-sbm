@@ -294,33 +294,35 @@ def plot_dynamic_sbm_transitions(
     
     n_blocks = len(block_labels)
     
-    # Adjust figure size based on number of blocks
-    fig_size = max(6, min(12, n_blocks * 0.6))
+    # Adjust figure size based on number of blocks (same as connection matrix)
+    fig_size = max(6, min(12, n_blocks * 0.5))
     fig, ax = plt.subplots(figsize=(fig_size + 1, fig_size))
     
     im = ax.imshow(transition_matrix, cmap='YlOrRd', aspect='equal', vmin=0, vmax=1)
     
+    # Add colorbar
     cbar = plt.colorbar(im, ax=ax, shrink=0.8)
     cbar.set_label('Transition Probability', fontsize=11)
     
-    # Just numbers on axes
+    # Add labels - just numbers (same style as connection matrix)
     ax.set_xticks(range(n_blocks))
     ax.set_yticks(range(n_blocks))
     ax.set_xticklabels(block_labels, fontsize=8)
     ax.set_yticklabels(block_labels, fontsize=8)
     ax.set_xlabel('Block (t+1)', fontsize=10)
     ax.set_ylabel('Block (t)', fontsize=10)
-    ax.set_title('Block Transition Probabilities', fontsize=12)
+    ax.set_title('Transition Probability Matrix', fontsize=12)
     
-    # Remove grid
+    # Remove grid lines
     ax.grid(False)
     
-    # Add values - smaller font, 1 decimal
-    fontsize = max(5, min(8, 100 // n_blocks))
+    # Add values as text - same adaptive font as connection matrix
+    fontsize = max(5, min(8, 120 // n_blocks))
     for i in range(n_blocks):
         for j in range(n_blocks):
             val = transition_matrix[i, j]
-            color = 'white' if val > 0.6 else 'black'
+            color = 'white' if val > 0.5 else 'black'
+            # Use 1 decimal for cleaner look, or 2 if value is small
             fmt = f'{val:.1f}' if val >= 0.1 or val == 0 else f'{val:.2f}'
             ax.text(j, i, fmt, ha='center', va='center', color=color, fontsize=fontsize)
     
