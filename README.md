@@ -512,88 +512,198 @@ animation:
 
 ## Theoretical Background
 
-This section provides the mathematical foundations underlying the implemented methods.
+This section summarizes the mathematical foundations used in the toolkit, following the notation from the *Network Data Analysis* course (M.F. Marino).
 
-### 1. Network Centrality Measures
+### Basic Notation
 
-Centrality measures quantify the importance of nodes within a network. Different measures capture different aspects of "importance."
+We consider a network on $n$ nodes $\{1,\dots,n\}$ described by the random adjacency matrix $Y$ and its observed realization $y$.
+The element $Y_{ij}$ is the dyadic variable representing the relationship between nodes $i$ and $j$.  
+In the binary case:
 
-#### Degree Centrality
+$$Y_{ij} = \begin{cases} 1 & \text{if there is an edge between } i \text{ and } j \\ 0 & \text{otherwise} \end{cases}$$
 
-The simplest measure — counts the number of connections:
-
-$$C_D(i) = \frac{k_i}{n-1}$$
-
-where $k_i$ is the degree of node $i$ and $n$ is the total number of nodes. Normalized to [0, 1].
-
-**Interpretation**: Nodes with high degree centrality are "popular" — they have many direct connections.
-
-#### Betweenness Centrality
-
-Measures how often a node lies on shortest paths between other nodes:
-
-$$C_B(i) = \sum_{s \neq i \neq t} \frac{\sigma_{st}(i)}{\sigma_{st}}$$
-
-where:
-- $\sigma_{st}$ is the total number of shortest paths from $s$ to $t$
-- $\sigma_{st}(i)$ is the number of those paths passing through $i$
-
-**Interpretation**: High betweenness nodes are "brokers" — they control information flow between different parts of the network.
-
-#### Closeness Centrality
-
-Based on the average distance to all other nodes:
-
-$$C_C(i) = \frac{n-1}{\sum_{j \neq i} d(i,j)}$$
-
-where $d(i,j)$ is the shortest path distance between $i$ and $j$.
-
-**Interpretation**: High closeness nodes can reach others quickly — they are "central" in a geographic sense.
-
-#### Eigenvector Centrality
-
-A node is important if it is connected to other important nodes:
-
-$$C_E(i) = \frac{1}{\lambda} \sum_{j \in N(i)} C_E(j)$$
-
-or in matrix form: $\mathbf{A} \mathbf{x} = \lambda \mathbf{x}$
-
-where $\lambda$ is the largest eigenvalue of the adjacency matrix $\mathbf{A}$.
-
-**Interpretation**: Measures influence — a node with few but highly central neighbors may be more central than a node with many peripheral neighbors.
-
-#### Network Centralization (Freeman, 1979)
-
-While centrality measures individual node importance, **centralization** measures how unequally centrality is distributed across the network:
-
-$$C = \frac{\sum_{i=1}^{n} [C_{max} - C(i)]}{\max \sum_{i=1}^{n} [C_{max} - C(i)]}$$
-
-- **C = 1**: Star network (one node dominates)
-- **C = 0**: All nodes equally central (e.g., ring or complete graph)
+For undirected networks, symmetry holds: $Y_{ij}=Y_{ji}$; for directed networks, $Y_{ij}$ and $Y_{ji}$ may differ.
 
 ---
 
-### 2. Stochastic Block Model (SBM)
+### 1. Global Statistics: Density, Reciprocity, Transitivity
 
-The Stochastic Block Model is a **generative probabilistic model** for networks with community structure.
+#### Density
 
-#### Model Specification
+The density $\rho$ is the ratio between observed ties and possible ties:
 
-1. Each node $i \in \{1, \ldots, n\}$ is assigned to a **block** $b_i \in \{1, \ldots, K\}$
-2. The probability of an edge between nodes $i$ and $j$ depends **only** on their block memberships:
+$$\rho = \frac{\#\text{observed ties}}{\#\text{possible ties}}$$
 
-$$P(A_{ij} = 1 | b_i, b_j) = \theta_{b_i b_j}$$
+For directed networks, the denominator is $n(n-1)$; for undirected networks, $n(n-1)/2$.
+In practice, starting from $y$, the numerator is computed as $\sum_i\sum_{j\neq i} y_{ij}$ (directed) or $\sum_i\sum_{j<i} y_{ij}$ (undirected).
+Moreover, $\rho \approx \Pr(Y_{ij}=1)$, i.e., it estimates the probability of observing a tie between two randomly selected nodes.
 
-where $\mathbf{\Theta}$ is a $K \times K$ matrix of connection probabilities.
+#### Reciprocity (directed networks)
 
-#### Why SBM over Modularity?
+Reciprocity $R$ is the fraction of reciprocated ties:
+
+$$R = \frac{\#\text{reciprocated ties}}{\#\text{observed ties}} = \frac{\sum_{ij} y_{ij}y_{ji}}{m}$$
+
+where $m$ is the number of observed ties.
+
+#### Transitivity / Clustering
+
+For undirected networks, transitivity measures how much "friends of friends" tend to be friends.
+One formulation is the coefficient:
+
+$$C = \frac{\#\text{closed paths of length 2}}{\#\text{paths of length 2}}$$
+
+Equivalently, via triad census:
+
+$$t(Y)=\{\#\text{null},\ \#\text{one-edge},\ \#\text{two-star},\ \#\text{triangle}\}$$
+
+and
+
+$$C = \frac{\#\text{triangles}}{\#\text{connected triplets}} = \frac{\#\text{triangles}}{\#\text{triangles}+\#\text{two-stars}}$$
+
+This can be interpreted as:
+
+$$C \approx \Pr(Y_{ih}=1 \mid Y_{ij}=1,\ Y_{jh}=1)$$
+
+thus measuring dyadic dependence.
+
+---
+
+### 2. Node Centrality and Network Centralization
+
+In the course, centrality measures (for undirected, unweighted networks) are presented using the notation $\zeta$.
+
+#### Degree Centrality
+
+$$\zeta_i^{d} = \sum_{j\neq i} y_{ij}, \qquad i=1,\dots,n$$
+
+It can be normalized by dividing by $(n-1)$.
+
+#### Closeness Centrality
+
+The geodesic distance $d_{ij}$ is defined as the length of the shortest path between $i$ and $j$.
+The *farness* of node $i$ is:
+
+$$\ell_i = d_{i1}+d_{i2}+\cdots+d_{in}$$
+
+and the closeness centrality:
+
+$$\zeta_i^{c}=\frac{1}{\ell_i}$$
+
+The normalized version is obtained by multiplying by $(n-1)$.
+
+#### Betweenness Centrality
+
+$$\zeta_i^{b}=\sum_{j>i}\sum_{k>j}\frac{n_{jk}^{i}}{g_{jk}}$$
+
+where $n_{jk}^{i}$ is the number of geodesic paths between $j$ and $k$ passing through $i$, and $g_{jk}$ is the total number of geodesic paths between $j$ and $k$.
+
+#### Network Centralization (Freeman, 1979)
+
+Given $\zeta_{\max}=\max_i \zeta_i$, the network centralization is:
+
+$$CI=\frac{\sum_{i=1}^n (\zeta_{\max}-\zeta_i)}{\max_Y \sum_{i=1}^n (\zeta_{\max}-\zeta_i)}$$
+
+where the denominator is the maximum sum achievable over all graphs of size $n$ (depends on the chosen index).
+
+> **Note**: The toolkit also includes **eigenvector centrality** as a practical extension; this measure is standard in the literature but is not among those formalized in the course slides.
+
+---
+
+### 3. Stochastic Block Model (SBM)
+
+The SBM is a generative model where the probability of observing a tie between two nodes depends on latent block membership variables.
+
+#### Latent Variables
+
+Each node $i$ belongs to one of $Q$ blocks, represented by:
+
+$$Z_i = (Z_{i1},\dots,Z_{iQ})^\top, \qquad Z_{iq}= \begin{cases} 1 & \text{if } i \text{ belongs to block } q\\ 0 & \text{otherwise} \end{cases} \quad\text{with}\quad \sum_q Z_{iq}=1$$
+
+The $Z_i$ are i.i.d.:
+
+$$Z_i \sim \text{Multinomial}(1,\alpha), \qquad \alpha_q=\Pr(Z_{iq}=1),\quad \sum_q \alpha_q=1$$
+
+#### Dyadic Model (binary network)
+
+Conditionally on block memberships, dyads are independent:
+
+$$\Pr(Y\mid Z)=\prod_{ij}\Pr(Y_{ij}\mid Z), \qquad \Pr(Y_{ij}\mid Z)=\Pr(Y_{ij}\mid Z_i,Z_j)$$
+
+with:
+
+$$Y_{ij}\mid(Z_{iq}=1,Z_{j\ell}=1)\sim \text{Bern}(\pi_{q\ell})$$
+
+For undirected networks, $\pi_{q\ell}=\pi_{\ell q}$.
+
+#### Estimation and Intractability
+
+Denoting $\theta=(\alpha,\pi)$ as the parameters, ML estimation requires:
+
+$$\hat\theta=\arg\max_\theta \log \Pr(Y;\theta) =\arg\max_\theta \log \sum_z \Pr(Y=y,Z=z;\theta)$$
+
+but the sum over all latent configurations $z$ grows prohibitively ($Q^n$ terms).
+
+#### Variational EM (VEM)
+
+A variational approximation of the log-likelihood is used:
+
+$$F(q(z),\theta)=\ell(\theta)-\mathrm{KL}\big[q(z),p(z\mid y;\theta)\big]$$
+
+A factorization is imposed:
+
+$$q(z)=\prod_i h(z_i;\tau_i), \qquad \tau_i=(\tau_{i1},\dots,\tau_{iQ})$$
+
+where $\tau_{iq}$ approximates $\Pr(Z_{iq}=1\mid Y=y)$.
+
+The algorithm alternates:
+1. **VE-step**: optimize $F$ with respect to $\tau_i$  
+2. **ME-step**: optimize $F$ with respect to $\alpha$ and $\pi$, with $\tau$ fixed
+
+until convergence.
+
+#### Block Assignment
+
+At convergence, node $i$ is assigned to the most probable block:
+
+$$\hat{q}_i = \arg\max_q \hat\tau_{iq}$$
+
+#### Model Selection (ICL)
+
+The number of blocks $Q$ can be selected via the **Integrated Classification Likelihood**:
+
+$$ICL = \log p(y,\tilde z)$$
+
+and $Q$ is chosen to maximize $ICL$.
+
+#### Extensions to Valued Networks
+
+For non-binary relationships:
+- (real-valued) $Y_{ij}\mid(Z_{iq}=1,Z_{j\ell}=1)\sim \mathcal{N}(\mu_{q\ell},\sigma_{q\ell})$
+- (count) $Y_{ij}\mid(Z_{iq}=1,Z_{j\ell}=1)\sim \mathrm{Pois}(\lambda_{q\ell})$
+
+> **Implementation note**: In the code we use `graph-tool`, which automatically selects the number of blocks via information-theoretic criteria (MDL) and MCMC inference. This is consistent with the idea of balancing fit and complexity, but **does not coincide** with the ICL presented in the course (which we report here as the theoretical basis).
+
+---
+
+### 4. SBM vs Modularity-based Methods
+
+A common alternative to SBM is **modularity optimization** (e.g., Louvain algorithm). Modularity is defined as:
+
+$$Q = \frac{1}{2m}\sum_{ij}\left(y_{ij} - \frac{k_i k_j}{2m}\right)\delta(c_i, c_j)$$
+
+where:
+- $m$ is the total number of edges
+- $k_i$ is the degree of node $i$
+- $c_i$ is the community assignment of node $i$
+- $\delta(c_i, c_j) = 1$ if $c_i = c_j$, 0 otherwise
 
 | Aspect | SBM | Modularity (e.g., Louvain) |
 |--------|-----|----------------------------|
 | **Approach** | Generative model | Heuristic optimization |
-| **Inference** | Probabilistic (Bayesian) | Greedy algorithm |
+| **Inference** | Probabilistic (Bayesian/VEM) | Greedy algorithm |
 | **Structure detected** | Assortative AND disassortative | Only assortative |
-| **Model selection** | Principled (MDL/BIC) | Resolution limit problem |
+| **Model selection** | Principled (ICL/MDL) | Resolution limit problem |
 | **Uncertainty** | Provides posterior probabilities | Point estimate only |
 
 The SBM can detect:
@@ -601,48 +711,19 @@ The SBM can detect:
 - **Disassortative structure**: nodes connect between blocks (bipartite-like)
 - **Core-periphery**: central blocks connect to all, peripheral blocks connect only to core
 
-#### Inference via Minimum Description Length
-
-We seek the block assignment $\mathbf{b}$ and parameters $\mathbf{\Theta}$ that best explain the observed network $\mathbf{A}$.
-
-Using the **Minimum Description Length** principle:
-
-$$\Sigma = -\log P(\mathbf{A} | \mathbf{\Theta}, \mathbf{b}) + \log P(\mathbf{\Theta}, \mathbf{b})$$
-
-This balances:
-- **Likelihood**: How well the model fits the data
-- **Complexity**: Penalty for model complexity (many blocks = higher penalty)
-
-The optimal number of blocks $K$ is chosen automatically by minimizing $\Sigma$.
-
-**Implementation**: We use `graph-tool`'s highly optimized MCMC algorithms (Peixoto, 2014).
-
 ---
 
-### 3. Dynamic Stochastic Block Model
+### 5. Temporal Extension (Dynamic SBM) — Project Extension
 
-In temporal networks, community structure may **evolve**:
-- Nodes may change group membership
-- New communities may form
-- Existing communities may merge or split
+For temporal networks constructed from edge lists with timestamps, we adopt a sliding-window strategy:
 
-#### Sliding Window Approach
+1. Segment time into overlapping windows
+2. For each window $w$, construct a snapshot $y^{(w)}$
+3. Fit an independent SBM for each $w$, obtaining $\hat\tau^{(w)}$ / partitions
+4. Solve the *label switching* problem by aligning labels across consecutive windows (Hungarian algorithm on block overlaps)
+5. Compute transition and stability statistics
 
-Following Matias & Miele (2017), we implement a discrete-time approach:
-
-1. **Partition time** into $T$ overlapping windows $[t_1, t_1+\Delta], [t_2, t_2+\Delta], \ldots$
-2. For each window $w$, construct the **snapshot graph** $G_w$ from edges active during that window
-3. Fit a static SBM to each $G_w$, obtaining block assignments $\mathbf{b}^{(w)}$
-4. **Align labels** across consecutive windows (the label switching problem)
-5. Compute **transition statistics**
-
-#### The Label Switching Problem
-
-Block labels are arbitrary — Block 1 in window $t$ may correspond to Block 3 in window $t+1$. We solve this using the **Hungarian algorithm**:
-
-$$\pi^* = \arg\max_{\pi} \sum_{k=1}^{K} |B_k^{(t)} \cap B_{\pi(k)}^{(t+1)}|$$
-
-where $\pi$ is a permutation of block labels.
+**This part is a project extension** (not formalized in the course slides), but maintains the same logic of latent partitioning applied to snapshots.
 
 #### Transition Matrix
 
