@@ -338,42 +338,69 @@ def plot_dynamic_sbm_evolution(
     dpi: int = 300
 ):
     """
-    Plot evolution of block sizes over time.
+    Plot evolution of block sizes over time as a heatmap.
+    
+    Shows blocks (rows) vs time windows (columns), with color intensity
+    representing block size (number of nodes in that block at that time).
+    
+    This visualization is more interpretable than stacked area charts
+    when there are many blocks, and clearly shows:
+    - Block existence (non-zero cells)
+    - Block size variations over time
+    - Block births/deaths (rows that appear/disappear)
     """
     setup_style()
     
-    # Collect all blocks
+    # Collect all blocks that appear at least once
     all_blocks = set()
     for winfo in window_block_info:
         all_blocks.update(winfo['block_sizes'].keys())
     all_blocks = sorted(all_blocks)
-    
-    # Build time series for each block
+    n_blocks = len(all_blocks)
     n_windows = len(window_block_info)
-    block_series = {b: np.zeros(n_windows) for b in all_blocks}
     
-    for i, winfo in enumerate(window_block_info):
+    if n_blocks == 0:
+        print("  Warning: No blocks found, skipping evolution plot")
+        return
+    
+    # Build matrix: rows = blocks, columns = time windows
+    # Value = number of nodes in that block at that time
+    block_to_idx = {b: i for i, b in enumerate(all_blocks)}
+    size_matrix = np.zeros((n_blocks, n_windows))
+    
+    for t, winfo in enumerate(window_block_info):
         for block, size in winfo['block_sizes'].items():
-            block_series[block][i] = size
+            size_matrix[block_to_idx[block], t] = size
     
-    # Plot stacked area
-    fig, ax = plt.subplots(figsize=(12, 6))
+    # Create heatmap
+    fig, ax = plt.subplots(figsize=(14, max(4, n_blocks * 0.35)))
     
-    cmap = plt.cm.Set2 if len(all_blocks) <= 8 else plt.cm.tab20
-    colors = [cmap(i / max(len(all_blocks) - 1, 1)) for i in range(len(all_blocks))]
+    # Use a diverging colormap with white for zero
+    im = ax.imshow(size_matrix, aspect='auto', cmap='YlGnBu', 
+                   interpolation='nearest', vmin=0)
     
-    x = range(n_windows)
-    bottom = np.zeros(n_windows)
+    # Colorbar
+    cbar = plt.colorbar(im, ax=ax, shrink=0.8, pad=0.02)
+    cbar.set_label('Block Size (nodes)', fontsize=10)
     
-    for block, color in zip(all_blocks, colors):
-        ax.fill_between(x, bottom, bottom + block_series[block], 
-                        label=f'Block {block}', color=color, alpha=0.8)
-        bottom += block_series[block]
+    # Axis labels
+    ax.set_xlabel('Time Window', fontsize=11)
+    ax.set_ylabel('Block', fontsize=11)
+    ax.set_title('Block Sizes Over Time (Dynamic SBM)', fontsize=12)
     
-    ax.set_xlabel('Time Window')
-    ax.set_ylabel('Number of Nodes')
-    ax.set_title('Block Sizes Over Time (Dynamic SBM)')
-    ax.legend(loc='upper right', ncol=min(4, len(all_blocks)))
+    # Y-axis: block labels
+    ax.set_yticks(range(n_blocks))
+    ax.set_yticklabels(all_blocks, fontsize=8)
+    
+    # X-axis: show every 5th or 10th window depending on count
+    step = 5 if n_windows <= 50 else 10
+    ax.set_xticks(range(0, n_windows, step))
+    ax.set_xticklabels(range(0, n_windows, step), fontsize=8)
+    
+    # Add grid for readability
+    ax.set_xticks(np.arange(-0.5, n_windows, 1), minor=True)
+    ax.set_yticks(np.arange(-0.5, n_blocks, 1), minor=True)
+    ax.grid(which='minor', color='white', linestyle='-', linewidth=0.5, alpha=0.3)
     
     plt.tight_layout()
     plt.savefig(output_path, dpi=dpi, bbox_inches='tight')

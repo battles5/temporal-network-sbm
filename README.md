@@ -450,13 +450,19 @@ The temporal activity shows clear **periodic patterns**:
 
 #### Dynamic SBM Results
 
-The Dynamic SBM analyzes how community structure evolves over time.
+The Dynamic SBM analyzes how community structure evolves over time by fitting independent SBMs to each time window and aligning labels across consecutive windows.
 
 ![Dynamic SBM Evolution](docs/dynamic_sbm_evolution.png)
 
-The number of detected blocks varies between 1 and 9 across time windows:
-- **Low activity periods** (night, early morning): fewer blocks detected (1-2)
-- **High activity periods** (school hours): more blocks detected (5-9)
+*Figure: Block Size Heatmap showing the number of nodes in each block (rows) across time windows (columns). Darker cells indicate larger blocks; white cells indicate absent blocks.*
+
+**Interpretation notes:**
+- Each row represents a block label (0, 1, 2, ...) as assigned after Hungarian algorithm alignment
+- The number of active blocks varies between 1 and 7 across time windows
+- **Low activity periods** (windows ~17–27, corresponding to night): 1–3 blocks detected
+- **High activity periods** (school hours): 5–7 blocks detected
+
+> **Caveat on label alignment**: The Hungarian algorithm aligns labels locally between consecutive windows $(t, t+1)$, which can cause "label drift" over longer periods. A block that appears as "Block 0" at $t=0$ may be relabeled as "Block 3" by $t=20$ due to accumulated misalignments. The transition matrix and heatmap should be interpreted with this limitation in mind.
 
 ![Dynamic SBM Transitions](docs/dynamic_sbm_transitions.png)
 
