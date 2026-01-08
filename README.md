@@ -819,9 +819,9 @@ Marino, M. F. (2024–2025). *Network Data Analysis* [Lecture slides]. Master's 
 
 ## Acknowledgments
 
-I would like to thank **Prof. Maria Francesca Marino** for the excellent course material. The theoretical foundations presented in her lectures on network data analysis, stochastic block models, and community detection provided the essential framework for this implementation.
+We would like to thank **Prof. Maria Francesca Marino** for the excellent course material. The theoretical foundations presented in her lectures on network data analysis, stochastic block models, and community detection provided the essential framework for this implementation.
 
-A special thanks to the developers and maintainers of the `graph-tool` library. Initially, I attempted to use **LaNet-vi** for network visualization, but despite extensive efforts, I was unable to get it to work properly (segmentation faults and compatibility issues). Thanks to `graph-tool`, I was able to complete this project entirely in Python — work that would otherwise have required R and its ecosystem of network analysis packages.
+We also thank the developers and maintainers of the `graph-tool` library. Initially, we attempted to use **LaNet-vi** for network visualization, but despite extensive efforts, we were unable to get it to work properly (segmentation faults and compatibility issues). Thanks to `graph-tool`, we were able to complete this project entirely in Python — work that would otherwise have required R and its ecosystem of network analysis packages.
 
 ---
 
