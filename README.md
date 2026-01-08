@@ -390,7 +390,7 @@ The SBM infers the latent community structure using Bayesian inference with the 
 |---------------|-------|
 | **Optimal number of blocks** | 18 |
 | **Description Length (MDL)** | 15,827.51 bits |
-| **ICL** | -9,584.23 |
+| **ICL** | -11,510.71 |
 
 > **Note**: The toolkit computes both MDL (from `graph-tool`) and ICL (following course notation). MDL is used for model selection during inference; ICL is reported for comparison with the course material.
 
