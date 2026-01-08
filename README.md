@@ -777,9 +777,9 @@ This project is based on the lecture material from:
 
 ## Acknowledgments
 
-I would like to thank **Prof. Maria Francesca Marino** for the excellent course material and guidance that made this project possible. The theoretical foundations presented in her lectures on network data analysis, stochastic block models, and community detection provided the essential framework for this implementation.
+I would like to thank **Prof. Maria Francesca Marino** for the excellent course material. The theoretical foundations presented in her lectures on network data analysis, stochastic block models, and community detection provided the essential framework for this implementation.
 
-Thanks also to **Tiago Peixoto** for the exceptional `graph-tool` library, which makes efficient inference on large networks accessible to the research community.
+A special thanks to the developers and maintainers of the `graph-tool` library. Initially, I attempted to use **LaNet-vi** for network visualization, but despite extensive efforts, I was unable to get it to work properly (segmentation faults and compatibility issues). Thanks to `graph-tool`, I was able to complete this project entirely in Python — work that would otherwise have required R and its ecosystem of network analysis packages.
 
 ---
 
