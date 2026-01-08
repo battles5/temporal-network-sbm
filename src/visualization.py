@@ -199,31 +199,40 @@ def plot_sbm_matrix(
     Plot SBM connection probability matrix.
     """
     setup_style()
-    fig, ax = plt.subplots(figsize=(8, 7))
     
     n_blocks = connection_probability_matrix.shape[0]
+    
+    # Adjust figure size based on number of blocks
+    fig_size = max(6, min(12, n_blocks * 0.5))
+    fig, ax = plt.subplots(figsize=(fig_size + 1, fig_size))
     
     im = ax.imshow(connection_probability_matrix, cmap='Blues', aspect='equal')
     
     # Add colorbar
     cbar = plt.colorbar(im, ax=ax, shrink=0.8)
-    cbar.set_label('Connection Probability')
+    cbar.set_label(r'$\hat{\pi}_{ql}$', fontsize=11)
     
-    # Add labels
+    # Add labels - just numbers, no "Block" prefix
     ax.set_xticks(range(n_blocks))
     ax.set_yticks(range(n_blocks))
-    ax.set_xticklabels([f'Block {i}' for i in range(n_blocks)], rotation=45, ha='right')
-    ax.set_yticklabels([f'Block {i}' for i in range(n_blocks)])
-    ax.set_xlabel('Block')
-    ax.set_ylabel('Block')
-    ax.set_title('SBM Connection Probability Matrix')
+    ax.set_xticklabels(range(n_blocks), fontsize=8)
+    ax.set_yticklabels(range(n_blocks), fontsize=8)
+    ax.set_xlabel('Block $\\ell$', fontsize=10)
+    ax.set_ylabel('Block $q$', fontsize=10)
+    ax.set_title('Connection Probability Matrix', fontsize=12)
     
-    # Add values as text
+    # Remove grid lines
+    ax.grid(False)
+    
+    # Add values as text - smaller font, 1 decimal for readability
+    fontsize = max(5, min(8, 120 // n_blocks))  # Adaptive font size
     for i in range(n_blocks):
         for j in range(n_blocks):
             val = connection_probability_matrix[i, j]
             color = 'white' if val > 0.5 else 'black'
-            ax.text(j, i, f'{val:.2f}', ha='center', va='center', color=color, fontsize=10)
+            # Use 1 decimal for cleaner look, or 2 if value is small
+            fmt = f'{val:.1f}' if val >= 0.1 or val == 0 else f'{val:.2f}'
+            ax.text(j, i, fmt, ha='center', va='center', color=color, fontsize=fontsize)
     
     plt.tight_layout()
     plt.savefig(output_path, dpi=dpi, bbox_inches='tight')
@@ -282,29 +291,38 @@ def plot_dynamic_sbm_transitions(
     Plot Dynamic SBM transition probability heatmap.
     """
     setup_style()
-    fig, ax = plt.subplots(figsize=(8, 7))
     
     n_blocks = len(block_labels)
+    
+    # Adjust figure size based on number of blocks
+    fig_size = max(6, min(12, n_blocks * 0.6))
+    fig, ax = plt.subplots(figsize=(fig_size + 1, fig_size))
     
     im = ax.imshow(transition_matrix, cmap='YlOrRd', aspect='equal', vmin=0, vmax=1)
     
     cbar = plt.colorbar(im, ax=ax, shrink=0.8)
-    cbar.set_label('Transition Probability')
+    cbar.set_label('$P(b_{t+1} | b_t)$', fontsize=11)
     
+    # Just numbers on axes
     ax.set_xticks(range(n_blocks))
     ax.set_yticks(range(n_blocks))
-    ax.set_xticklabels([f'Block {b}' for b in block_labels], rotation=45, ha='right')
-    ax.set_yticklabels([f'Block {b}' for b in block_labels])
-    ax.set_xlabel('Block at time t+1')
-    ax.set_ylabel('Block at time t')
-    ax.set_title('Block Transition Probabilities\nP(block_{t+1} | block_t)')
+    ax.set_xticklabels(block_labels, fontsize=8)
+    ax.set_yticklabels(block_labels, fontsize=8)
+    ax.set_xlabel('Block at $t+1$', fontsize=10)
+    ax.set_ylabel('Block at $t$', fontsize=10)
+    ax.set_title('Block Transition Probabilities', fontsize=12)
     
-    # Add values
+    # Remove grid
+    ax.grid(False)
+    
+    # Add values - smaller font, 1 decimal
+    fontsize = max(5, min(8, 100 // n_blocks))
     for i in range(n_blocks):
         for j in range(n_blocks):
             val = transition_matrix[i, j]
             color = 'white' if val > 0.6 else 'black'
-            ax.text(j, i, f'{val:.2f}', ha='center', va='center', color=color, fontsize=9)
+            fmt = f'{val:.1f}' if val >= 0.1 or val == 0 else f'{val:.2f}'
+            ax.text(j, i, fmt, ha='center', va='center', color=color, fontsize=fontsize)
     
     plt.tight_layout()
     plt.savefig(output_path, dpi=dpi, bbox_inches='tight')
