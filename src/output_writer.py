@@ -36,6 +36,8 @@ def write_metrics_csv(
     if sbm_results:
         all_metrics['sbm_n_blocks'] = sbm_results.get('n_blocks', 0)
         all_metrics['sbm_description_length'] = sbm_results.get('description_length', 0)
+        if 'icl' in sbm_results:
+            all_metrics['sbm_icl'] = sbm_results.get('icl', 0)
     
     with open(output_path, 'w', newline='') as f:
         writer = csv.writer(f)
@@ -219,6 +221,8 @@ def write_summary(
         lines.append("-" * 40)
         lines.append(f"Optimal blocks: {sbm_results['n_blocks']}")
         lines.append(f"Description length (MDL): {sbm_results['description_length']:.2f}")
+        if 'icl' in sbm_results:
+            lines.append(f"ICL (Integrated Classification Likelihood): {sbm_results['icl']:.2f}")
         lines.append("Block sizes:")
         for block, size in sorted(sbm_results['block_sizes'].items()):
             density = sbm_results.get('block_densities', {}).get(block, 0)

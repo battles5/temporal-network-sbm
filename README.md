@@ -390,6 +390,9 @@ The SBM infers the latent community structure using Bayesian inference with the 
 |---------------|-------|
 | **Optimal number of blocks** | 18 |
 | **Description Length (MDL)** | 15,827.51 bits |
+| **ICL** | -9,584.23 |
+
+> **Note**: The toolkit computes both MDL (from `graph-tool`) and ICL (following course notation). MDL is used for model selection during inference; ICL is reported for comparison with the course material.
 
 ##### Block Sizes and Densities
 
@@ -532,7 +535,9 @@ For undirected networks, symmetry holds: $Y_{ij}=Y_{ji}$; for directed networks,
 
 The density $\rho$ is the ratio between observed ties and possible ties:
 
-$$\rho = \frac{\#\text{observed ties}}{\#\text{possible ties}}$$
+$$\rho = \frac{m}{m_{\max}}$$
+
+where $m$ is the number of observed ties and $m_{\max}$ is the maximum possible number of ties.
 
 For directed networks, the denominator is $n(n-1)$; for undirected networks, $n(n-1)/2$.
 In practice, starting from $y$, the numerator is computed as $\sum_i\sum_{j\neq i} y_{ij}$ (directed) or $\sum_i\sum_{j<i} y_{ij}$ (undirected).
@@ -542,7 +547,7 @@ Moreover, $\rho \approx \Pr(Y_{ij}=1)$, i.e., it estimates the probability of ob
 
 Reciprocity $R$ is the fraction of reciprocated ties:
 
-$$R = \frac{\#\text{reciprocated ties}}{\#\text{observed ties}} = \frac{\sum_{ij} y_{ij}y_{ji}}{m}$$
+$$R = \frac{\sum_{ij} y_{ij}y_{ji}}{m}$$
 
 where $m$ is the number of observed ties.
 
@@ -551,15 +556,11 @@ where $m$ is the number of observed ties.
 For undirected networks, transitivity measures how much "friends of friends" tend to be friends.
 One formulation is the coefficient:
 
-$$C = \frac{\#\text{closed paths of length 2}}{\#\text{paths of length 2}}$$
+$$C = \frac{\text{(closed paths of length 2)}}{\text{(paths of length 2)}}$$
 
-Equivalently, via triad census:
+Equivalently, via triad census, we count the number of null triads, one-edge triads, two-stars, and triangles. Then:
 
-$$t(Y)=\{\#\text{null},\ \#\text{one-edge},\ \#\text{two-star},\ \#\text{triangle}\}$$
-
-and
-
-$$C = \frac{\#\text{triangles}}{\#\text{connected triplets}} = \frac{\#\text{triangles}}{\#\text{triangles}+\#\text{two-stars}}$$
+$$C = \frac{3 \times (\text{triangles})}{(\text{triangles}) + (\text{two-stars})}$$
 
 This can be interpreted as:
 
@@ -672,17 +673,19 @@ $$\hat{q}_i = \arg\max_q \hat\tau_{iq}$$
 
 The number of blocks $Q$ can be selected via the **Integrated Classification Likelihood**:
 
-$$ICL = \log p(y,\tilde z)$$
+$$ICL = \log p(y,\tilde z) - \frac{Q-1}{2}\log n - \frac{Q(Q+1)}{4}\log\frac{n(n-1)}{2}$$
 
 and $Q$ is chosen to maximize $ICL$.
+
+The first term is the complete-data log-likelihood (given the MAP assignment $\tilde z$), while the penalty terms are BIC-like corrections for the block proportions $\alpha$ and connection probabilities $\pi$.
+
+> **Implementation note**: The toolkit computes **both** MDL (via `graph-tool`'s MCMC inference) **and** ICL (as defined above). MDL is information-theoretic and used during model fitting; ICL is the Bayesian approximation from the course. Both are reported in the output.
 
 #### Extensions to Valued Networks
 
 For non-binary relationships:
 - (real-valued) $Y_{ij}\mid(Z_{iq}=1,Z_{j\ell}=1)\sim \mathcal{N}(\mu_{q\ell},\sigma_{q\ell})$
 - (count) $Y_{ij}\mid(Z_{iq}=1,Z_{j\ell}=1)\sim \mathrm{Pois}(\lambda_{q\ell})$
-
-> **Implementation note**: In the code we use `graph-tool`, which automatically selects the number of blocks via information-theoretic criteria (MDL) and MCMC inference. This is consistent with the idea of balancing fit and complexity, but **does not coincide** with the ICL presented in the course (which we report here as the theoretical basis).
 
 ---
 

@@ -175,6 +175,99 @@ def get_sbm_summary(
     return summary
 
 
+def compute_icl(
+    g: Graph,
+    block_assignment: np.ndarray
+) -> float:
+    """
+    Compute the Integrated Classification Likelihood (ICL) for SBM.
+    
+    Following the course notation (M.F. Marino), ICL is an approximation
+    of the integrated likelihood that penalizes model complexity.
+    
+    ICL = log p(y | z_hat, theta_hat) - penalty_alpha - penalty_pi
+    
+    where:
+    - penalty_alpha = (Q-1)/2 * log(n)  for block proportions
+    - penalty_pi = Q(Q+1)/4 * log(n(n-1)/2)  for connection probabilities
+    
+    Parameters
+    ----------
+    g : Graph
+        The input graph
+    block_assignment : np.ndarray
+        Block assignment for each node
+        
+    Returns
+    -------
+    icl : float
+        The ICL value (higher is better)
+    """
+    n = g.num_vertices()
+    m = g.num_edges()
+    
+    unique_blocks = np.unique(block_assignment)
+    Q = len(unique_blocks)
+    
+    if Q == 0 or n < 2:
+        return float('-inf')
+    
+    # Remap blocks to 0, 1, ..., Q-1
+    block_map = {b: i for i, b in enumerate(unique_blocks)}
+    z = np.array([block_map[b] for b in block_assignment])
+    
+    # Count block sizes
+    n_q = np.bincount(z, minlength=Q)
+    
+    # Count edges within and between blocks
+    e_ql = np.zeros((Q, Q))
+    for edge in g.edges():
+        i, j = int(edge.source()), int(edge.target())
+        q_i, q_j = z[i], z[j]
+        if q_i <= q_j:
+            e_ql[q_i, q_j] += 1
+        else:
+            e_ql[q_j, q_i] += 1
+    
+    # Compute log-likelihood
+    log_lik = 0.0
+    for q in range(Q):
+        for l in range(q, Q):
+            if q == l:
+                # Within-block edges
+                n_possible = n_q[q] * (n_q[q] - 1) / 2
+            else:
+                # Between-block edges
+                n_possible = n_q[q] * n_q[l]
+            
+            if n_possible > 0:
+                e_obs = e_ql[q, l]
+                pi_ql = e_obs / n_possible if n_possible > 0 else 0
+                
+                # Avoid log(0)
+                if pi_ql > 0 and pi_ql < 1:
+                    log_lik += e_obs * np.log(pi_ql)
+                    log_lik += (n_possible - e_obs) * np.log(1 - pi_ql)
+                elif pi_ql == 1 and e_obs > 0:
+                    # All possible edges exist, log(1) = 0
+                    pass
+                elif pi_ql == 0:
+                    # No edges, log(1) = 0
+                    pass
+    
+    # Penalty terms (BIC-like)
+    # Penalty for alpha (Q-1 free parameters)
+    penalty_alpha = (Q - 1) / 2 * np.log(n)
+    
+    # Penalty for pi (Q(Q+1)/2 parameters for undirected network)
+    n_pairs = n * (n - 1) / 2
+    penalty_pi = Q * (Q + 1) / 4 * np.log(n_pairs) if n_pairs > 1 else 0
+    
+    icl = log_lik - penalty_alpha - penalty_pi
+    
+    return round(icl, 2)
+
+
 def run_sbm_analysis(
     g: Graph,
     node_list: List[int],
@@ -198,6 +291,11 @@ def run_sbm_analysis(
     # Add block densities
     densities = compute_block_densities(g, results['block_assignment'])
     results['block_densities'] = densities
+    
+    # Compute ICL (Integrated Classification Likelihood)
+    icl = compute_icl(g, results['block_assignment'])
+    results['icl'] = icl
+    print(f"  ICL: {icl}")
     
     # Generate summary
     block_summary = get_sbm_summary(results, node_list)
