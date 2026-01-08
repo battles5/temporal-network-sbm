@@ -6,7 +6,7 @@
 
 A comprehensive Python toolkit for analyzing **temporal (dynamic) networks** using **Stochastic Block Models (SBM)**.
 
-This project was developed as an examination work for the course **Network Data Analysis** taught by Prof. **Maria Francesca Marino** at the University of Florence (Università degli Studi di Firenze), within the Master's program in **Data Science and Statistical Learning (MD2SL)**.
+This project was developed as an examination work for the course Network Data Analysis taught by Prof. Maria Francesca Marino at the University of Florence, within the Master's program in Data Science and Statistical Learning MD2SL.
 
 The toolkit implements rigorous statistical methods for network community detection, combining classical network analysis with modern inference-based approaches. It provides a complete pipeline from raw temporal edge data to publication-quality visualizations and comprehensive statistical reports.
 
@@ -521,9 +521,7 @@ This section summarizes the mathematical foundations used in the toolkit, follow
 
 We consider a network on $n$ nodes $\{1,\dots,n\}$ described by the random adjacency matrix $Y$ and its observed realization $y$.
 The element $Y_{ij}$ is the dyadic variable representing the relationship between nodes $i$ and $j$.  
-In the binary case:
-
-$$Y_{ij} = \begin{cases} 1 & \text{if there is an edge between } i \text{ and } j \\ 0 & \text{otherwise} \end{cases}$$
+In the binary case, $Y_{ij} = 1$ if there is an edge between $i$ and $j$, and $Y_{ij} = 0$ otherwise.
 
 For undirected networks, symmetry holds: $Y_{ij}=Y_{ji}$; for directed networks, $Y_{ij}$ and $Y_{ji}$ may differ.
 
@@ -617,9 +615,9 @@ The SBM is a generative model where the probability of observing a tie between t
 
 #### Latent Variables
 
-Each node $i$ belongs to one of $Q$ blocks, represented by:
+Each node $i$ belongs to one of $Q$ blocks, represented by the indicator vector:
 
-$$Z_i = (Z_{i1},\dots,Z_{iQ})^\top, \qquad Z_{iq}= \begin{cases} 1 & \text{if } i \text{ belongs to block } q\\ 0 & \text{otherwise} \end{cases} \quad\text{with}\quad \sum_q Z_{iq}=1$$
+$$Z_i = (Z_{i1},\dots,Z_{iQ})^\top \quad\text{where}\quad Z_{iq} = 1 \text{ if node } i \in \text{block } q, \quad 0 \text{ otherwise}, \quad \sum_q Z_{iq}=1$$
 
 The $Z_i$ are i.i.d.:
 
