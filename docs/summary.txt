@@ -3,7 +3,7 @@ TEMPORAL NETWORK ANALYSIS REPORT
 ============================================================
 
 Dataset: tij_LyonSchool.dat
-Generated: 2026-01-08 16:45:19
+Generated: 2026-01-08 17:07:45
 
 ----------------------------------------
 NETWORK STATISTICS
@@ -58,24 +58,24 @@ Optimal blocks: 18
 Description length (MDL): 15827.51
 ICL (Integrated Classification Likelihood): -11510.71
 Block sizes:
-  Block 4: 13 nodes (density=1.000)
-  Block 14: 16 nodes (density=0.992)
-  Block 16: 6 nodes (density=1.000)
-  Block 20: 11 nodes (density=0.946)
-  Block 22: 11 nodes (density=0.982)
-  Block 27: 20 nodes (density=0.805)
-  Block 48: 11 nodes (density=1.000)
-  Block 82: 15 nodes (density=1.000)
-  Block 98: 16 nodes (density=0.950)
-  Block 101: 16 nodes (density=0.992)
-  Block 108: 23 nodes (density=0.968)
-  Block 141: 8 nodes (density=1.000)
-  Block 143: 8 nodes (density=0.857)
-  Block 148: 16 nodes (density=0.983)
-  Block 151: 16 nodes (density=0.983)
-  Block 174: 17 nodes (density=0.993)
-  Block 189: 11 nodes (density=1.000)
-  Block 200: 8 nodes (density=1.000)
+  Block 24: 11 nodes (density=0.982)
+  Block 30: 23 nodes (density=0.968)
+  Block 54: 16 nodes (density=0.992)
+  Block 56: 16 nodes (density=0.983)
+  Block 66: 20 nodes (density=0.805)
+  Block 75: 16 nodes (density=0.983)
+  Block 77: 8 nodes (density=1.000)
+  Block 89: 16 nodes (density=0.992)
+  Block 102: 8 nodes (density=1.000)
+  Block 105: 13 nodes (density=1.000)
+  Block 130: 16 nodes (density=0.950)
+  Block 153: 11 nodes (density=1.000)
+  Block 182: 6 nodes (density=1.000)
+  Block 185: 11 nodes (density=0.946)
+  Block 202: 17 nodes (density=0.993)
+  Block 204: 11 nodes (density=1.000)
+  Block 207: 8 nodes (density=0.857)
+  Block 208: 15 nodes (density=1.000)
 
 ----------------------------------------
 TEMPORAL ANALYSIS

@@ -210,15 +210,15 @@ def plot_sbm_matrix(
     
     # Add colorbar
     cbar = plt.colorbar(im, ax=ax, shrink=0.8)
-    cbar.set_label(r'$\hat{\pi}_{ql}$', fontsize=11)
+    cbar.set_label('Connection Probability', fontsize=11)
     
     # Add labels - just numbers, no "Block" prefix
     ax.set_xticks(range(n_blocks))
     ax.set_yticks(range(n_blocks))
     ax.set_xticklabels(range(n_blocks), fontsize=8)
     ax.set_yticklabels(range(n_blocks), fontsize=8)
-    ax.set_xlabel('Block $\\ell$', fontsize=10)
-    ax.set_ylabel('Block $q$', fontsize=10)
+    ax.set_xlabel('Block', fontsize=10)
+    ax.set_ylabel('Block', fontsize=10)
     ax.set_title('Connection Probability Matrix', fontsize=12)
     
     # Remove grid lines
@@ -301,15 +301,15 @@ def plot_dynamic_sbm_transitions(
     im = ax.imshow(transition_matrix, cmap='YlOrRd', aspect='equal', vmin=0, vmax=1)
     
     cbar = plt.colorbar(im, ax=ax, shrink=0.8)
-    cbar.set_label('$P(b_{t+1} | b_t)$', fontsize=11)
+    cbar.set_label('Transition Probability', fontsize=11)
     
     # Just numbers on axes
     ax.set_xticks(range(n_blocks))
     ax.set_yticks(range(n_blocks))
     ax.set_xticklabels(block_labels, fontsize=8)
     ax.set_yticklabels(block_labels, fontsize=8)
-    ax.set_xlabel('Block at $t+1$', fontsize=10)
-    ax.set_ylabel('Block at $t$', fontsize=10)
+    ax.set_xlabel('Block (t+1)', fontsize=10)
+    ax.set_ylabel('Block (t)', fontsize=10)
     ax.set_title('Block Transition Probabilities', fontsize=12)
     
     # Remove grid
