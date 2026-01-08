@@ -88,6 +88,10 @@ dmypy.json
 output/
 results/
 
+# docs/ should only contain images for README
+docs/*.csv
+docs/*.txt
+
 # Animation frames (large, can be regenerated)
 animation_frames/
 
