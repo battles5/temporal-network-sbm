@@ -783,12 +783,12 @@ A special thanks to the developers and maintainers of the `graph-tool` library. 
 
 ---
 
-## Author
+## Authors
 
-**Orso Peruzzi**
+**Orso Peruzzi** & **Giovanni Di Donato**
 
-Master's student in Data Science and Statistical Learning (MD2SL)  
-University of Florence, Italy
+Master's students in Data Science and Statistical Learning (MD2SL)  
+[IMT School for Advanced Studies Lucca](https://www.imtlucca.it/) & [University of Florence](https://www.unifi.it/), Italy
 
 ---
 
