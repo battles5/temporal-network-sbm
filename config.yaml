@@ -1,0 +1,35 @@
+# Configuration for Temporal Network SBM Analysis
+# ================================================
+
+# Input file parsing
+input:
+  separator: "auto"      # auto, space, tab, comma, semicolon
+  skip_header: false     # Skip first line if it's a header
+
+# Time window parameters for temporal analysis
+time_windows:
+  window_size_seconds: 300   # 5 minutes
+  window_step_seconds: 60    # 1 minute step (overlapping windows)
+
+# Static SBM parameters
+sbm:
+  max_blocks: 20         # Maximum blocks to consider
+  equilibrate: true      # Run MCMC equilibration (better but slower)
+
+# Dynamic SBM parameters
+dynamic_sbm:
+  enabled: true          # Run dynamic SBM analysis
+  max_windows: 50        # Maximum time windows to analyze
+  max_blocks: 10         # Maximum blocks for each window
+
+# Visualization settings
+visualization:
+  dpi: 300               # Output resolution
+  format: "png"          # Output format (png, pdf, svg)
+
+# Animation settings
+animation:
+  enabled: false         # Generate animation (slow, set to true to enable)
+  max_frames: 100        # Maximum frames to generate
+  fps: 10                # Frames per second
+  resolution: [1920, 1080]  # Output resolution [width, height]

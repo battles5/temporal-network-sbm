@@ -1,0 +1,16 @@
+# Python dependencies for temporal-network-sbm
+# =============================================
+
+# Core dependencies
+numpy>=1.20.0
+scipy>=1.7.0
+matplotlib>=3.5.0
+pyyaml>=6.0
+
+# graph-tool must be installed via conda or apt:
+# conda install -c conda-forge graph-tool
+# OR (Ubuntu/Debian):
+# sudo apt install python3-graph-tool
+
+# Note: graph-tool is not available on PyPI
+# See README.md for installation instructions
