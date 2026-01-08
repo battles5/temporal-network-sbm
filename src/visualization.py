@@ -375,16 +375,20 @@ def plot_dynamic_sbm_evolution(
     # Create heatmap
     fig, ax = plt.subplots(figsize=(14, max(4, n_blocks * 0.35)))
     
-    # Use a diverging colormap with white for zero
-    im = ax.imshow(size_matrix, aspect='auto', cmap='YlGnBu', 
-                   interpolation='nearest', vmin=0)
+    # Use monochrome colormap (Blues) with power-law scaling for better visibility
+    # of smaller blocks. gamma < 1 expands the lower range.
+    from matplotlib.colors import PowerNorm
+    max_size = size_matrix.max()
+    im = ax.imshow(size_matrix, aspect='auto', cmap='Blues', 
+                   interpolation='nearest',
+                   norm=PowerNorm(gamma=0.5, vmin=0, vmax=max_size))
     
     # Colorbar
     cbar = plt.colorbar(im, ax=ax, shrink=0.8, pad=0.02)
     cbar.set_label('Block Size (nodes)', fontsize=10)
     
-    # Axis labels
-    ax.set_xlabel('Time Window', fontsize=11)
+    # Axis labels - clarify that each window covers ~39 minutes for 50 windows over 32h
+    ax.set_xlabel('Time Window (each ≈ 39 min, total ≈ 32 hours)', fontsize=11)
     ax.set_ylabel('Block', fontsize=11)
     ax.set_title('Block Sizes Over Time (Dynamic SBM)', fontsize=12)
     
