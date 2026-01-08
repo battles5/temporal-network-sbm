@@ -3,7 +3,7 @@ TEMPORAL NETWORK ANALYSIS REPORT
 ============================================================
 
 Dataset: tij_LyonSchool.dat
-Generated: 2026-01-08 17:07:45
+Generated: 2026-01-08 17:17:04
 
 ----------------------------------------
 NETWORK STATISTICS
@@ -58,24 +58,24 @@ Optimal blocks: 18
 Description length (MDL): 15827.51
 ICL (Integrated Classification Likelihood): -11510.71
 Block sizes:
-  Block 24: 11 nodes (density=0.982)
-  Block 30: 23 nodes (density=0.968)
-  Block 54: 16 nodes (density=0.992)
-  Block 56: 16 nodes (density=0.983)
-  Block 66: 20 nodes (density=0.805)
-  Block 75: 16 nodes (density=0.983)
-  Block 77: 8 nodes (density=1.000)
-  Block 89: 16 nodes (density=0.992)
-  Block 102: 8 nodes (density=1.000)
-  Block 105: 13 nodes (density=1.000)
-  Block 130: 16 nodes (density=0.950)
-  Block 153: 11 nodes (density=1.000)
-  Block 182: 6 nodes (density=1.000)
-  Block 185: 11 nodes (density=0.946)
-  Block 202: 17 nodes (density=0.993)
-  Block 204: 11 nodes (density=1.000)
-  Block 207: 8 nodes (density=0.857)
-  Block 208: 15 nodes (density=1.000)
+  Block 13: 16 nodes (density=0.950)
+  Block 34: 17 nodes (density=0.993)
+  Block 39: 11 nodes (density=1.000)
+  Block 56: 8 nodes (density=1.000)
+  Block 95: 16 nodes (density=0.983)
+  Block 111: 15 nodes (density=1.000)
+  Block 115: 16 nodes (density=0.992)
+  Block 116: 16 nodes (density=0.992)
+  Block 146: 16 nodes (density=0.983)
+  Block 157: 13 nodes (density=1.000)
+  Block 162: 6 nodes (density=1.000)
+  Block 168: 8 nodes (density=1.000)
+  Block 169: 11 nodes (density=1.000)
+  Block 178: 11 nodes (density=0.946)
+  Block 202: 11 nodes (density=0.982)
+  Block 207: 23 nodes (density=0.968)
+  Block 224: 20 nodes (density=0.805)
+  Block 240: 8 nodes (density=0.857)
 
 ----------------------------------------
 TEMPORAL ANALYSIS
@@ -85,6 +85,44 @@ Unique timestamps: 3100
 Time windows analyzed: 1039
 Avg edges per window: 265.1
 Peak activity: 554 edges
+
+----------------------------------------
+DYNAMIC SBM
+----------------------------------------
+Windows analyzed: 50
+Block stability (probability of staying in same block):
+  Block 7: 0.787
+  Block 8: 0.231
+  Block 9: 0.740
+  Block 10: 0.751
+  Block 11: 0.452
+  Block 12: 0.409
+  Block 13: 0.355
+  Block 14: 0.417
+  Block 15: 0.457
+  Block 16: 0.050
+  Block 17: 0.000
+  Block 18: 0.000
+  Block 19: 0.000
+  Block 222: 0.000
+  Block 223: 0.421
+  Block 224: 0.304
+  Block 225: 0.475
+  Block 226: 0.252
+  Block 227: 0.000
+  Block 228: 0.408
+  Block 229: 0.400
+  Block 230: 0.000
+  Block 231: 0.269
+  Block 232: 0.000
+  Block 233: 0.188
+Nodes that changed blocks: 20
+Top 5 mobile nodes:
+  Node 1912: 15 changes
+  Node 1665: 14 changes
+  Node 1666: 13 changes
+  Node 1675: 13 changes
+  Node 1684: 13 changes
 
 ============================================================
 END OF REPORT
