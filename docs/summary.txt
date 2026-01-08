@@ -3,7 +3,7 @@ TEMPORAL NETWORK ANALYSIS REPORT
 ============================================================
 
 Dataset: tij_LyonSchool.dat
-Generated: 2026-01-08 17:17:04
+Generated: 2026-01-08 17:24:55
 
 ----------------------------------------
 NETWORK STATISTICS
@@ -58,24 +58,24 @@ Optimal blocks: 18
 Description length (MDL): 15827.51
 ICL (Integrated Classification Likelihood): -11510.71
 Block sizes:
-  Block 13: 16 nodes (density=0.950)
-  Block 34: 17 nodes (density=0.993)
-  Block 39: 11 nodes (density=1.000)
-  Block 56: 8 nodes (density=1.000)
-  Block 95: 16 nodes (density=0.983)
-  Block 111: 15 nodes (density=1.000)
-  Block 115: 16 nodes (density=0.992)
-  Block 116: 16 nodes (density=0.992)
-  Block 146: 16 nodes (density=0.983)
-  Block 157: 13 nodes (density=1.000)
-  Block 162: 6 nodes (density=1.000)
-  Block 168: 8 nodes (density=1.000)
-  Block 169: 11 nodes (density=1.000)
-  Block 178: 11 nodes (density=0.946)
-  Block 202: 11 nodes (density=0.982)
-  Block 207: 23 nodes (density=0.968)
-  Block 224: 20 nodes (density=0.805)
-  Block 240: 8 nodes (density=0.857)
+  Block 9: 17 nodes (density=0.993)
+  Block 18: 8 nodes (density=0.857)
+  Block 22: 13 nodes (density=1.000)
+  Block 27: 16 nodes (density=0.992)
+  Block 38: 11 nodes (density=1.000)
+  Block 50: 16 nodes (density=0.983)
+  Block 51: 11 nodes (density=0.946)
+  Block 75: 8 nodes (density=1.000)
+  Block 77: 11 nodes (density=0.982)
+  Block 82: 20 nodes (density=0.805)
+  Block 102: 8 nodes (density=1.000)
+  Block 125: 23 nodes (density=0.968)
+  Block 126: 16 nodes (density=0.983)
+  Block 130: 11 nodes (density=1.000)
+  Block 134: 15 nodes (density=1.000)
+  Block 161: 6 nodes (density=1.000)
+  Block 182: 16 nodes (density=0.992)
+  Block 234: 16 nodes (density=0.950)
 
 ----------------------------------------
 TEMPORAL ANALYSIS
@@ -91,38 +91,31 @@ DYNAMIC SBM
 ----------------------------------------
 Windows analyzed: 50
 Block stability (probability of staying in same block):
-  Block 7: 0.787
-  Block 8: 0.231
-  Block 9: 0.740
-  Block 10: 0.751
-  Block 11: 0.452
-  Block 12: 0.409
-  Block 13: 0.355
-  Block 14: 0.417
-  Block 15: 0.457
-  Block 16: 0.050
-  Block 17: 0.000
-  Block 18: 0.000
-  Block 19: 0.000
-  Block 222: 0.000
-  Block 223: 0.421
-  Block 224: 0.304
-  Block 225: 0.475
-  Block 226: 0.252
-  Block 227: 0.000
-  Block 228: 0.408
-  Block 229: 0.400
-  Block 230: 0.000
-  Block 231: 0.269
-  Block 232: 0.000
-  Block 233: 0.188
+  Block 0: 0.247
+  Block 1: 0.789
+  Block 2: 0.316
+  Block 3: 0.708
+  Block 4: 0.330
+  Block 5: 0.759
+  Block 6: 0.437
+  Block 7: 0.460
+  Block 8: 0.497
+  Block 9: 0.443
+  Block 10: 0.000
+  Block 11: 0.490
+  Block 12: 0.154
+  Block 13: 0.226
+  Block 14: 0.111
+  Block 15: 0.759
+  Block 16: 0.175
+  Block 17: 0.455
 Nodes that changed blocks: 20
 Top 5 mobile nodes:
-  Node 1912: 15 changes
-  Node 1665: 14 changes
-  Node 1666: 13 changes
-  Node 1675: 13 changes
-  Node 1684: 13 changes
+  Node 1761: 13 changes
+  Node 1493: 12 changes
+  Node 1502: 12 changes
+  Node 1764: 12 changes
+  Node 1452: 11 changes
 
 ============================================================
 END OF REPORT

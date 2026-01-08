@@ -37,6 +37,15 @@ from scipy.optimize import linear_sum_assignment
 from .sbm import fit_sbm, compute_block_densities
 
 
+def remap_to_contiguous(assignment: np.ndarray) -> np.ndarray:
+    """
+    Remap block assignments to contiguous integers 0, 1, ..., K-1.
+    """
+    unique_blocks = np.unique(assignment)
+    mapping = {b: i for i, b in enumerate(unique_blocks)}
+    return np.array([mapping[b] for b in assignment])
+
+
 def align_block_labels(
     prev_assignment: np.ndarray,
     curr_assignment: np.ndarray
@@ -50,15 +59,18 @@ def align_block_labels(
     Parameters
     ----------
     prev_assignment : array
-        Block assignments from previous window
+        Block assignments from previous window (should be 0..K-1)
     curr_assignment : array
         Block assignments from current window
         
     Returns
     -------
     aligned : array
-        Realigned block assignments for current window
+        Realigned block assignments for current window (0..K'-1)
     """
+    # First remap current to contiguous
+    curr_assignment = remap_to_contiguous(curr_assignment)
+    
     prev_blocks = np.unique(prev_assignment)
     curr_blocks = np.unique(curr_assignment)
     
@@ -78,13 +90,14 @@ def align_block_labels(
     # Hungarian algorithm
     row_ind, col_ind = linear_sum_assignment(cost_matrix)
     
-    # Create mapping
+    # Create mapping: current block -> aligned label
     mapping = {}
     for r, c in zip(row_ind, col_ind):
         mapping[curr_blocks[r]] = prev_blocks[c]
     
-    # Handle unmapped blocks (new blocks)
-    next_label = max(prev_blocks) + 1 if len(prev_blocks) > 0 else 0
+    # Handle unmapped blocks (new blocks that didn't exist in prev)
+    # Assign them new labels starting from max(prev) + 1
+    next_label = int(max(prev_blocks)) + 1 if len(prev_blocks) > 0 else 0
     for cb in curr_blocks:
         if cb not in mapping:
             mapping[cb] = next_label
@@ -270,8 +283,11 @@ def run_dynamic_sbm(
             state, sbm_results = fit_sbm(g, max_blocks=max_blocks, equilibrate=False, n_init=3)
             block_assignment = sbm_results['block_assignment']
             
-            # Align labels with previous window
-            if prev_assignment is not None:
+            # Remap to contiguous 0..K-1 for first window
+            if prev_assignment is None:
+                block_assignment = remap_to_contiguous(block_assignment)
+            else:
+                # Align labels with previous window
                 block_assignment = align_block_labels(prev_assignment, block_assignment)
             
             assignments.append(block_assignment)

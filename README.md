@@ -556,9 +556,11 @@ One formulation is the coefficient:
 
 $$C = \frac{\text{(closed paths of length 2)}}{\text{(paths of length 2)}}$$
 
-Equivalently, via triad census, we count the number of null triads, one-edge triads, two-stars, and triangles. Then:
+Equivalently, via triad census, we count the number of triangles and connected triplets (two-stars). Then:
 
-$$C = \frac{3 \times (\text{triangles})}{(\text{triangles}) + (\text{two-stars})}$$
+$$C = \frac{\text{(triangles)}}{\text{(triangles)} + \text{(two-stars)}}$$
+
+where connected triplets = triangles + two-stars.
 
 This can be interpreted as:
 
@@ -669,15 +671,19 @@ $$\hat{q}_i = \arg\max_q \hat\tau_{iq}$$
 
 #### Model Selection (ICL)
 
-The number of blocks $Q$ can be selected via the **Integrated Classification Likelihood**:
+The number of blocks $Q$ can be selected via the **Integrated Classification Likelihood**. In the course slides, the ICL is presented as:
 
-$$ICL = \log p(y,\tilde z) - \frac{Q-1}{2}\log n - \frac{Q(Q+1)}{4}\log\frac{n(n-1)}{2}$$
+$$ICL = \log p(y, \tilde{z})$$
 
-and $Q$ is chosen to maximize $ICL$.
+where $\tilde{z}$ is the MAP (maximum a posteriori) assignment of nodes to blocks. The number $Q$ is chosen to maximize this criterion.
 
-The first term is the complete-data log-likelihood (given the MAP assignment $\tilde z$), while the penalty terms are BIC-like corrections for the block proportions $\alpha$ and connection probabilities $\pi$.
+In practice, a **BIC-like penalized version** is often used to avoid overfitting:
 
-> **Implementation note**: The toolkit computes **both** MDL (via `graph-tool`'s MCMC inference) **and** ICL (as defined above). MDL is information-theoretic and used during model fitting; ICL is the Bayesian approximation from the course. Both are reported in the output.
+$$ICL_{\text{pen}} = \log p(y,\tilde z) - \frac{Q-1}{2}\log n - \frac{Q(Q+1)}{4}\log\frac{n(n-1)}{2}$$
+
+where the penalty terms correct for the number of free parameters in $\alpha$ (block proportions) and $\pi$ (connection probabilities).
+
+> **Implementation note**: The toolkit computes **both** MDL (via `graph-tool`'s MCMC inference, used for model fitting) **and** the penalized ICL (as defined above, for comparison with course material). Both are reported in the output.
 
 #### Extensions to Valued Networks
 
