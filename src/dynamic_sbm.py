@@ -125,7 +125,7 @@ def compute_transition_matrix(
     transition_matrix : array
         P(b_{t+1} = s | b_t = r)
     block_labels : list
-        Unique block labels
+        Contiguous block labels 0, 1, 2, ..., K-1
     """
     if len(assignments) < 2:
         return np.array([]), []
@@ -134,9 +134,14 @@ def compute_transition_matrix(
     all_blocks = set()
     for a in assignments:
         all_blocks.update(np.unique(a))
-    block_labels = sorted(all_blocks)
-    n_blocks = len(block_labels)
-    label_to_idx = {b: i for i, b in enumerate(block_labels)}
+    original_labels = sorted(all_blocks)
+    n_blocks = len(original_labels)
+    
+    # Map original labels to contiguous 0..K-1
+    label_to_idx = {b: i for i, b in enumerate(original_labels)}
+    
+    # Return contiguous labels 0, 1, 2, ..., K-1
+    block_labels = list(range(n_blocks))
     
     # Count transitions
     transition_counts = np.zeros((n_blocks, n_blocks))
