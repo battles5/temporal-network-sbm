@@ -677,101 +677,61 @@ High-mobility nodes may represent:
 
 ### Foundational Works
 
-- **Holland, P. W., & Leinhardt, S.** (1976).  
-  *Local structure in social networks*.  
-  **Sociological Methodology**, 7, 1–45.
+Holland, P. W., & Leinhardt, S. (1976). Local structure in social networks. *Sociological Methodology*, *7*, 1–45.
 
-- **Holland, P. W., & Leinhardt, S.** (1981).  
-  *An exponential family of probability distributions for directed graphs*.  
-  **Journal of the American Statistical Association**, 76(373), 33–50.
+Holland, P. W., & Leinhardt, S. (1981). An exponential family of probability distributions for directed graphs. *Journal of the American Statistical Association*, *76*(373), 33–50. https://doi.org/10.1080/01621459.1981.10477598
 
-- **Holland, P. W., Laskey, K. B., & Leinhardt, S.** (1983).  
-  *Stochastic blockmodels: First steps*.  
-  **Social Networks**, 5(2), 109–137.
+Holland, P. W., Laskey, K. B., & Leinhardt, S. (1983). Stochastic blockmodels: First steps. *Social Networks*, *5*(2), 109–137.
 
 ### Centrality
 
-- **Freeman, L. C.** (1979).  
-  *Centrality in social networks: Conceptual clarification*.  
-  **Social Networks**, 1(3), 215–239.
+Freeman, L. C. (1979). Centrality in social networks: Conceptual clarification. *Social Networks*, *1*(3), 215–239. https://doi.org/10.1016/0378-8733(78)90021-7
 
 ### Latent Variable Models
 
-- **Lazarsfeld, P. F., & Henry, N. W.** (1968).  
-  *Latent structure analysis*.  
-  Boston: Houghton Mifflin.
-
-- **Hoff, P. D., Raftery, A. E., & Handcock, M. S.** (2002).  
-  *Latent space approaches to social network analysis*.  
-  **Journal of the American Statistical Association**, 97(460), 1090–1098.
+Hoff, P. D., Raftery, A. E., & Handcock, M. S. (2002). Latent space approaches to social network analysis. *Journal of the American Statistical Association*, *97*(460), 1090–1098. https://doi.org/10.1198/016214502388618906
 
 ### Stochastic Block Models
 
-- **Snijders, T. A. B., & Nowicki, K.** (1997).  
-  *Estimation and prediction for stochastic blockmodels for graphs with latent block structure*.  
-  **Journal of Classification**, 14(1), 75–100.
+Nowicki, K., & Snijders, T. A. B. (2001). Estimation and prediction for stochastic blockstructures. *Journal of the American Statistical Association*, *96*(455), 1077–1087. https://doi.org/10.1198/016214501753208735
 
-- **Nowicki, K., & Snijders, T. A. B.** (2001).  
-  *Estimation and prediction for stochastic blockstructures*.  
-  **Journal of the American Statistical Association**, 96(455), 1077–1087.
+Daudin, J. J., Picard, F., & Robin, S. (2008). A mixture model for random graphs. *Statistics and Computing*, *18*(2), 173–183. https://doi.org/10.1007/s11222-007-9060-7
 
-- **Daudin, J. J., Picard, F., & Robin, S.** (2008).  
-  *A mixture model for random graphs*.  
-  **Statistics and Computing**, 18(2), 173–183.
-
-- **Airoldi, E. M., Blei, D. M., Fienberg, S. E., & Xing, E. P.** (2008).  
-  *Mixed membership stochastic blockmodels*.  
-  **Journal of Machine Learning Research**, 9, 1981–2014.
-
-### Dynamic Networks
-
-- **Matias, C., & Miele, V.** (2017).  
-  *Statistical clustering of temporal dynamic networks*.  
-  **Statistical Computing**, 27(4), 1065–1086.
+Airoldi, E. M., Blei, D. M., Fienberg, S. E., & Xing, E. P. (2008). Mixed membership stochastic blockmodels. *Journal of Machine Learning Research*, *9*, 1981–2014. https://jmlr.org/papers/v9/airoldi08a.html
 
 ### Exponential Random Graph Models
 
-- **Frank, O., & Strauss, D.** (1986).  
-  *Markov graphs*.  
-  **Journal of the American Statistical Association**, 81(395), 832–842.
+Frank, O., & Strauss, D. (1986). Markov graphs. *Journal of the American Statistical Association*, *81*(395), 832–842. https://doi.org/10.1080/01621459.1986.10478342
+
+### Spatial Models
+
+Lindgren, F. (2010). Continuous domain spatial models in R-INLA. *Environmental and Ecological Statistics*, *18*, 165–183. https://doi.org/10.1007/s10651-009-0115-1
 
 ### Applied Network Analysis
 
-- **Gulati, R., & Gargiulo, M.** (1999).  
-  *Where do interorganizational networks come from?*  
-  **American Journal of Sociology**, 104(5), 1439–1493.
+Gulati, R., & Gargiulo, M. (1999). Where do interorganizational networks come from? *American Journal of Sociology*, *104*(5), 1439–1493. https://doi.org/10.1086/210179
+
+### Dynamic Networks
+
+Matias, C., & Miele, V. (2017). Statistical clustering of temporal dynamic networks. *Statistics and Computing*, *27*(4), 1065–1086.
 
 ### Software
 
-- **Peixoto, T. P.** (2014).  
-  *The graph-tool Python library*.  
-  [https://graph-tool.skewed.de/](https://graph-tool.skewed.de/)
+Peixoto, T. P. (2014). The graph-tool Python library. https://graph-tool.skewed.de/
 
-- **Peixoto, T. P.** (2014).  
-  *Efficient Monte Carlo and greedy heuristic for the inference of stochastic block models*.  
-  **Physical Review E**, 89(1), 012804.
+Peixoto, T. P. (2014). Efficient Monte Carlo and greedy heuristic for the inference of stochastic block models. *Physical Review E*, *89*(1), 012804.
 
 ### Data
 
-- **SocioPatterns Project**  
-  [http://www.sociopatterns.org/](http://www.sociopatterns.org/)
+SocioPatterns Collaboration. (n.d.). *SocioPatterns*. http://www.sociopatterns.org/
 
-- **Stehlé, J., Voirin, N., Barrat, A., et al.** (2011).  
-  *High-resolution measurements of face-to-face contact patterns in a primary school*.  
-  **PLoS ONE**, 6(8), e23176.
+Stehlé, J., Voirin, N., Barrat, A., Cattuto, C., Isella, L., Pinton, J.-F., Quaggiotto, M., Van den Broeck, W., Régis, C., Lina, B., & Vanhems, P. (2011). High-resolution measurements of face-to-face contact patterns in a primary school. *PLoS ONE*, *6*(8), e23176.
 
 ---
 
 ## Course Material
 
-This project is based on the lecture material from:
-
-> **Marino, M. F.**  
-> *Network Data Analysis*  
-> Master's Degree in Data Science and Statistical Learning (MD2SL)  
-> Dipartimento di Statistica, Informatica, Applicazioni (DiSIA)  
-> Università degli Studi di Firenze  
-> Academic Year 2024–2025
+Marino, M. F. (2024–2025). *Network Data Analysis* [Lecture slides]. Master's Degree in Data Science and Statistical Learning (MD2SL), Dipartimento di Statistica, Informatica, Applicazioni (DiSIA), Università degli Studi di Firenze.
 
 ---
 
