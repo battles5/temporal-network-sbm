@@ -70,6 +70,19 @@ For temporal networks, we implement a sliding-window approach inspired by the `d
 - Block stability metrics
 - Identification of **mobile nodes** (nodes frequently changing blocks)
 
+### Hypergraph Group Extraction (Cliques)
+
+Many real-world social interactions involve more than two individuals simultaneously. While temporal edge lists record only pairwise contacts, we can approximate **higher-order group interactions** by extracting cliques from aggregated time windows, following the approach of Iacopini et al. (2022).
+
+**Key idea**: Within a time window, if individuals A, B, and C all interact pairwise (A↔B, B↔C, A↔C), they likely participated in a group interaction. This corresponds to a clique (complete subgraph) in the contact network.
+
+- Extract **maximal cliques** from each time-window snapshot
+- Each clique of size k represents a k-person group interaction (hyperedge)
+- Compute the **distribution of group sizes** across all windows
+- Track how group sizes evolve over time
+
+This analysis is optional and can be enabled with the `--hypergraph` flag.
+
 ### Visualization Suite
 
 All analyses are accompanied by publication-ready visualizations:
@@ -82,6 +95,8 @@ All analyses are accompanied by publication-ready visualizations:
 - Temporal activity timeline
 - Dynamic SBM transition heatmap
 - Block evolution over time
+- **Group size distribution** (when hypergraph analysis is enabled)
+- **Group size over time** (median/IQR per window)
 - **Animated network evolution** (optional, 4K resolution)
 
 ---
@@ -192,6 +207,12 @@ python main.py --input data/mydata.dat --output results/ --animate
 
 # Skip dynamic SBM for faster execution
 python main.py --input data/mydata.dat --output results/ --no-dynamic-sbm
+
+# Enable hypergraph group extraction (clique analysis)
+python main.py --input data/mydata.dat --output results/ --hypergraph
+
+# Hypergraph with custom group size limits
+python main.py --input data/mydata.dat --output results/ --hypergraph --min-group-size 4 --max-group-size 15
 ```
 
 ### Command Line Arguments
@@ -203,6 +224,10 @@ python main.py --input data/mydata.dat --output results/ --no-dynamic-sbm
 | `--config` | `-c` | Path to YAML configuration file |
 | `--animate` | | Generate network animation (MP4/GIF) |
 | `--no-dynamic-sbm` | | Skip dynamic SBM analysis |
+| `--hypergraph` | | Enable hypergraph group extraction via cliques |
+| `--min-group-size` | | Minimum clique size (default: 3) |
+| `--max-group-size` | | Maximum clique size (default: 20) |
+| `--max-cliques-per-window` | | Safety limit for clique enumeration |
 
 ---
 
@@ -265,13 +290,17 @@ output/
 │   ├── temporal_activity.png
 │   ├── dynamic_sbm_transitions.png
 │   ├── dynamic_sbm_evolution.png
-│   └── network_animation.mp4  (if --animate)
+│   ├── group_size_distribution.png  (if --hypergraph)
+│   ├── group_size_over_time.png     (if --hypergraph)
+│   └── network_animation.mp4        (if --animate)
 ├── metrics.csv
 ├── top_nodes.csv
 ├── sbm_results.csv
 ├── dynamic_sbm_windows.csv
 ├── dynamic_sbm_transitions.csv
 ├── dynamic_sbm_stability.csv
+├── hypergraph_groups.csv            (if --hypergraph)
+├── group_size_distribution.csv      (if --hypergraph)
 └── summary.txt
 ```
 
@@ -285,6 +314,8 @@ output/
 | `dynamic_sbm_windows.csv` | Per-window SBM results (blocks, edges, MDL) |
 | `dynamic_sbm_transitions.csv` | Block-to-block transition probability matrix |
 | `dynamic_sbm_stability.csv` | Stability score for each block |
+| `hypergraph_groups.csv` | All extracted groups: window_id, group_id, group_size, node_ids |
+| `group_size_distribution.csv` | Distribution of group sizes: size, count, proportion |
 | `summary.txt` | Human-readable comprehensive report |
 
 ---
@@ -543,7 +574,29 @@ animation:
   max_frames: 100
   fps: 10
   resolution: [1920, 1080]   # HD, use [3840, 2160] for 4K
+
+# Hypergraph group extraction (clique-based)
+# See: Iacopini et al. (2022) https://doi.org/10.1038/s42005-022-00845-y
+hypergraph:
+  enabled: false             # Enable with --hypergraph flag
+  min_group_size: 3          # Minimum clique size (3 = triangles+)
+  max_group_size: 20         # Safety limit for large cliques
+  max_cliques_per_window: 10000  # Safety limit per window
 ```
+
+### Command-Line Options
+
+| Option | Description |
+|--------|-------------|
+| `--input`, `-i` | Path to input temporal edge list (required) |
+| `--output`, `-o` | Path to output directory (required) |
+| `--config`, `-c` | Path to configuration YAML file |
+| `--animate` | Generate network animation (slow) |
+| `--no-dynamic-sbm` | Skip dynamic SBM analysis |
+| `--hypergraph` | Enable hypergraph group extraction via cliques |
+| `--min-group-size` | Minimum group/clique size (default: 3) |
+| `--max-group-size` | Maximum group/clique size (default: 20) |
+| `--max-cliques-per-window` | Safety limit for clique enumeration (default: 10000) |
 
 ---
 
@@ -795,6 +848,43 @@ High-mobility nodes may represent:
 
 ---
 
+### 6. Hypergraph Group Extraction via Cliques
+
+Many real-world social interactions involve more than two individuals simultaneously (e.g., group conversations, classroom activities, meetings). Standard pairwise network representations may fail to capture these **higher-order interactions**.
+
+#### From Pairwise to Group Interactions
+
+Given a temporal network recorded as pairwise contacts $(t, i, j)$, we can approximate group interactions using **clique extraction** (Iacopini et al., 2022):
+
+1. For each time window $[t, t + \Delta t)$, aggregate all contacts into a snapshot graph $G_w$
+2. Extract **maximal cliques** from $G_w$
+3. Interpret each clique as a group interaction (hyperedge)
+
+A **clique** is a complete subgraph where every pair of nodes is connected. If three individuals all interacted pairwise within the same time window, they form a triangle (clique of size 3), suggesting a group interaction.
+
+#### Maximal Cliques
+
+A **maximal clique** is a clique that cannot be extended by adding any adjacent vertex. This ensures we capture the largest groups without redundancy.
+
+#### Group Size Distribution
+
+The distribution of group sizes $P(k)$ reveals the social structure:
+- **Power-law decay**: Many small groups, few large ones (typical in face-to-face data)
+- **Characteristic scale**: Preferred group sizes (e.g., classrooms, teams)
+
+$$P(k) = \frac{|\{C : |C| = k\}|}{\sum_k |\{C : |C| = k\}|}$$
+
+where $C$ denotes a clique (group) and $|C|$ its size.
+
+#### Computational Considerations
+
+Maximal clique enumeration can be computationally expensive (exponential in worst case). The toolkit implements safety measures:
+- Maximum clique size limit (`max_group_size`)
+- Maximum cliques per window (`max_cliques_per_window`)
+- Density-based skipping for overly dense graphs
+
+---
+
 ## References
 
 ### Foundational Works
@@ -828,6 +918,10 @@ Frank, O., & Strauss, D. (1986). Markov graphs. *Journal of the American Statist
 ### Dynamic Networks
 
 Matias, C., & Miele, V. (2017). Statistical clustering of temporal dynamic networks. *Statistics and Computing*, *27*(4), 1065–1086.
+
+### Higher-Order Interactions and Hypergraphs
+
+Iacopini, I., Petri, G., Baronchelli, A., & Barrat, A. (2022). Group interactions modulate critical mass dynamics in social convention. *Communications Physics*, *5*, 64. https://doi.org/10.1038/s42005-022-00845-y
 
 ### Software
 

@@ -493,3 +493,186 @@ def create_all_visualizations(
                 )
     
     print(f"Visualizations saved to {figures_dir}")
+
+
+# ============================================================================
+# Hypergraph Visualizations
+# ============================================================================
+
+def plot_group_size_distribution(
+    distribution_df,
+    output_path: str,
+    dpi: int = 300
+):
+    """
+    Plot the distribution of group sizes (hyperedge sizes).
+    
+    Creates a bar chart showing how many groups of each size were found,
+    with both linear and log-scale views.
+    
+    Parameters
+    ----------
+    distribution_df : pandas.DataFrame
+        DataFrame with columns: group_size, count, proportion
+    output_path : str
+        Path to save the figure
+    dpi : int
+        Output resolution
+    """
+    setup_style()
+    
+    if distribution_df.empty:
+        print(f"  Skipped (no groups): {output_path}")
+        return
+    
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    
+    sizes = distribution_df['group_size'].values
+    counts = distribution_df['count'].values
+    
+    # Linear scale bar chart
+    ax1 = axes[0]
+    bars1 = ax1.bar(sizes, counts, color='steelblue', edgecolor='white', alpha=0.9)
+    ax1.set_xlabel('Group Size (clique size)')
+    ax1.set_ylabel('Count')
+    ax1.set_title('Group Size Distribution')
+    ax1.set_xticks(sizes)
+    
+    # Add proportion labels on bars
+    total = counts.sum()
+    for bar, count in zip(bars1, counts):
+        height = bar.get_height()
+        pct = 100 * count / total
+        if pct >= 3:  # Only label bars >= 3%
+            ax1.annotate(f'{pct:.1f}%',
+                        xy=(bar.get_x() + bar.get_width() / 2, height),
+                        xytext=(0, 3), textcoords="offset points",
+                        ha='center', va='bottom', fontsize=9)
+    
+    # Log scale bar chart
+    ax2 = axes[1]
+    ax2.bar(sizes, counts, color='coral', edgecolor='white', alpha=0.9)
+    ax2.set_xlabel('Group Size (clique size)')
+    ax2.set_ylabel('Count (log scale)')
+    ax2.set_title('Group Size Distribution (Log Scale)')
+    ax2.set_yscale('log')
+    ax2.set_xticks(sizes)
+    
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=dpi, bbox_inches='tight')
+    plt.close()
+    print(f"  Saved: {output_path}")
+
+
+def plot_group_size_over_time(
+    groups_by_window: dict,
+    output_path: str,
+    dpi: int = 300
+):
+    """
+    Plot median and quantiles of group size per time window.
+    
+    Parameters
+    ----------
+    groups_by_window : dict
+        Keys are window_id, values are lists of group sizes
+    output_path : str
+        Path to save the figure
+    dpi : int
+        Output resolution
+    """
+    import pandas as pd
+    
+    setup_style()
+    
+    if not groups_by_window:
+        print(f"  Skipped (no data): {output_path}")
+        return
+    
+    # Compute statistics per window
+    window_ids = sorted(groups_by_window.keys())
+    medians = []
+    q25 = []
+    q75 = []
+    means = []
+    
+    for w in window_ids:
+        sizes = groups_by_window[w]
+        if sizes:
+            medians.append(np.median(sizes))
+            q25.append(np.percentile(sizes, 25))
+            q75.append(np.percentile(sizes, 75))
+            means.append(np.mean(sizes))
+        else:
+            medians.append(np.nan)
+            q25.append(np.nan)
+            q75.append(np.nan)
+            means.append(np.nan)
+    
+    fig, ax = plt.subplots(figsize=(12, 5))
+    
+    # Plot with fill between for IQR
+    ax.fill_between(window_ids, q25, q75, alpha=0.3, color='steelblue', 
+                   label='IQR (25-75%)')
+    ax.plot(window_ids, medians, 'o-', color='steelblue', linewidth=2, 
+            markersize=4, label='Median')
+    ax.plot(window_ids, means, '--', color='coral', linewidth=1.5, 
+            alpha=0.8, label='Mean')
+    
+    ax.set_xlabel('Time Window')
+    ax.set_ylabel('Group Size')
+    ax.set_title('Group Size Over Time')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=dpi, bbox_inches='tight')
+    plt.close()
+    print(f"  Saved: {output_path}")
+
+
+def create_hypergraph_visualizations(
+    hypergraph_results: dict,
+    output_dir: str,
+    dpi: int = 300
+):
+    """
+    Create all hypergraph-related visualizations.
+    
+    Parameters
+    ----------
+    hypergraph_results : dict
+        Results from run_hypergraph_analysis()
+    output_dir : str
+        Output directory
+    dpi : int
+        Output resolution
+    """
+    figures_dir = os.path.join(output_dir, 'figures')
+    os.makedirs(figures_dir, exist_ok=True)
+    
+    print("Creating hypergraph visualizations...")
+    
+    # Group size distribution
+    if 'distribution' in hypergraph_results:
+        plot_group_size_distribution(
+            hypergraph_results['distribution'],
+            os.path.join(figures_dir, 'group_size_distribution.png'),
+            dpi=dpi
+        )
+    
+    # Group size over time
+    if 'groups' in hypergraph_results and hypergraph_results['groups']:
+        # Build groups_by_window
+        groups_by_window = {}
+        for g in hypergraph_results['groups']:
+            w = g['window_id']
+            if w not in groups_by_window:
+                groups_by_window[w] = []
+            groups_by_window[w].append(g['group_size'])
+        
+        plot_group_size_over_time(
+            groups_by_window,
+            os.path.join(figures_dir, 'group_size_over_time.png'),
+            dpi=dpi
+        )

@@ -33,9 +33,10 @@ from src.static_analysis import run_static_analysis
 from src.temporal_analysis import run_temporal_analysis
 from src.sbm import run_sbm_analysis
 from src.dynamic_sbm import run_dynamic_sbm
-from src.visualization import create_all_visualizations
+from src.visualization import create_all_visualizations, create_hypergraph_visualizations
 from src.output_writer import write_all_outputs
 from src.animation import create_animation_frames
+from src.temporal_hypergraph import run_hypergraph_analysis, write_hypergraph_outputs
 
 
 def load_config(config_path: Optional[str]) -> dict:
@@ -68,6 +69,12 @@ def load_config(config_path: Optional[str]) -> dict:
             'max_frames': 100,
             'fps': 10,
             'resolution': [1920, 1080]
+        },
+        'hypergraph': {
+            'enabled': False,
+            'min_group_size': 3,
+            'max_group_size': 20,
+            'max_cliques_per_window': 10000
         }
     }
     
@@ -109,6 +116,14 @@ For more information, see README.md
                         help='Generate network animation (slow)')
     parser.add_argument('--no-dynamic-sbm', action='store_true',
                         help='Skip dynamic SBM analysis (faster)')
+    parser.add_argument('--hypergraph', action='store_true',
+                        help='Extract group interactions via clique analysis (Iacopini et al.)')
+    parser.add_argument('--min-group-size', type=int, default=None,
+                        help='Minimum group/clique size (default: 3)')
+    parser.add_argument('--max-group-size', type=int, default=None,
+                        help='Maximum group/clique size (default: 20)')
+    parser.add_argument('--max-cliques-per-window', type=int, default=None,
+                        help='Safety limit: max cliques per window (default: 10000)')
     
     args = parser.parse_args()
     
@@ -125,6 +140,14 @@ For more information, see README.md
         config['animation']['enabled'] = True
     if args.no_dynamic_sbm:
         config['dynamic_sbm']['enabled'] = False
+    if args.hypergraph:
+        config['hypergraph']['enabled'] = True
+    if args.min_group_size is not None:
+        config['hypergraph']['min_group_size'] = args.min_group_size
+    if args.max_group_size is not None:
+        config['hypergraph']['max_group_size'] = args.max_group_size
+    if args.max_cliques_per_window is not None:
+        config['hypergraph']['max_cliques_per_window'] = args.max_cliques_per_window
     
     print("=" * 60)
     print("TEMPORAL NETWORK SBM ANALYSIS")
@@ -215,6 +238,27 @@ For more information, see README.md
         )
         print()
     
+    # 7b. Hypergraph group extraction (optional)
+    hypergraph_results = {}
+    if config['hypergraph']['enabled']:
+        print("-" * 40)
+        print("HYPERGRAPH GROUP EXTRACTION (CLIQUES)")
+        print("-" * 40)
+        
+        # Build time windows dict format for hypergraph analysis
+        hg_time_windows = [{'t_start': w['t_start'], 't_end': w['t_end']} 
+                          for w in time_windows]
+        
+        hypergraph_results = run_hypergraph_analysis(
+            temporal_edges,
+            hg_time_windows,
+            min_group_size=config['hypergraph']['min_group_size'],
+            max_group_size=config['hypergraph']['max_group_size'],
+            max_cliques_per_window=config['hypergraph']['max_cliques_per_window'],
+            verbose=True
+        )
+        print()
+    
     # 8. Write outputs
     print("-" * 40)
     print("WRITING OUTPUTS")
@@ -225,6 +269,10 @@ For more information, see README.md
         sbm_results, block_summary, dynamic_results,
         args.input, args.output
     )
+    
+    # Write hypergraph outputs if enabled
+    if hypergraph_results:
+        write_hypergraph_outputs(hypergraph_results, args.output)
     print()
     
     # 9. Create visualizations
@@ -238,6 +286,14 @@ For more information, see README.md
         args.output,
         dpi=config['visualization']['dpi']
     )
+    
+    # Hypergraph visualizations
+    if hypergraph_results:
+        create_hypergraph_visualizations(
+            hypergraph_results,
+            args.output,
+            dpi=config['visualization']['dpi']
+        )
     print()
     
     # 10. Animation (optional)

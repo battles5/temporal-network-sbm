@@ -7,6 +7,9 @@ scipy>=1.7.0
 matplotlib>=3.5.0
 pyyaml>=6.0
 
+# NetworkX (for clique enumeration in hypergraph analysis)
+networkx>=2.8
+
 # graph-tool must be installed via conda or apt:
 # conda install -c conda-forge graph-tool
 # OR (Ubuntu/Debian):

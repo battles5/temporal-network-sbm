@@ -33,3 +33,12 @@ animation:
   max_frames: 100        # Maximum frames to generate
   fps: 10                # Frames per second
   resolution: [1920, 1080]  # Output resolution [width, height]
+
+# Hypergraph group extraction (clique analysis)
+# Inspired by: Iacopini et al. (2022) "Group interactions modulate critical mass..."
+# https://doi.org/10.1038/s42005-022-00845-y
+hypergraph:
+  enabled: false         # Enable clique-based group extraction
+  min_group_size: 3      # Minimum clique size (3 = triangles and larger)
+  max_group_size: 20     # Maximum clique size to consider (safety limit)
+  max_cliques_per_window: 10000  # Safety limit per time window
