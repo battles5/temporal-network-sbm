@@ -62,7 +62,7 @@ Moving beyond heuristic community detection, this toolkit uses principled Bayesi
 - Hard partition of nodes into blocks (MAP assignment from MCMC inference)
 - Inter-block connection probability matrix Π
 - Internal block density analysis
-- Comparison with degree-corrected variants
+- **ICL** (Integrated Classification Likelihood) for model comparison
 
 ### Dynamic Stochastic Block Model
 
@@ -102,7 +102,7 @@ All analyses are accompanied by publication-ready visualizations:
 - Block evolution over time
 - **Group size distribution** (when hypergraph analysis is enabled)
 - **Group size over time** (median/IQR per window)
-- **Animated network evolution** (optional, 4K resolution)
+- **Animated network evolution** (optional, configurable resolution)
 
 See the [Output](#output) section below for exact filenames (e.g., `figures/sbm_block_matrix.png`, `figures/dynamic_sbm_transitions.png`, `figures/group_size_distribution.png`).
 
