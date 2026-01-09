@@ -55,7 +55,7 @@ Moving beyond heuristic community detection, this toolkit uses principled Bayesi
 
 - Automatic detection of optimal number of blocks via **Minimum Description Length (MDL)**
 - Block membership assignment with uncertainty quantification
-- Inter-block connection probability matrix Θ
+- Inter-block connection probability matrix Π
 - Internal block density analysis
 - Comparison with degree-corrected variants
 
@@ -112,7 +112,7 @@ sudo apt install python3-graph-tool
 ```
 > ⚠️ The `apt` method may fail on some Ubuntu versions. If you encounter issues, use Conda instead.
 
-**Option C: Docker**
+**Docker (containerized)**
 ```bash
 docker pull tiagopeixoto/graph-tool
 docker run -it tiagopeixoto/graph-tool python3
@@ -422,24 +422,24 @@ The SBM infers the latent community structure using Bayesian inference with the 
 
 | Block | Size | Internal Density |
 |-------|------|------------------|
-| Block 1 | 8 | 0.857 |
-| Block 2 | 11 | 1.000 |
-| Block 3 | 11 | 0.946 |
-| Block 4 | 15 | 1.000 |
-| Block 5 | 13 | 1.000 |
-| Block 6 | 16 | 0.983 |
-| Block 7 | 23 | 0.968 |
-| Block 8 | 16 | 0.950 |
-| Block 9 | 11 | 1.000 |
+| Block 0 | 8 | 0.857 |
+| Block 1 | 11 | 1.000 |
+| Block 2 | 11 | 0.946 |
+| Block 3 | 15 | 1.000 |
+| Block 4 | 13 | 1.000 |
+| Block 5 | 16 | 0.983 |
+| Block 6 | 23 | 0.968 |
+| Block 7 | 16 | 0.950 |
+| Block 8 | 11 | 1.000 |
+| Block 9 | 16 | 0.992 |
 | Block 10 | 16 | 0.992 |
-| Block 11 | 16 | 0.992 |
-| Block 12 | 20 | 0.805 |
-| Block 13 | 8 | 1.000 |
-| Block 14 | 11 | 0.982 |
-| Block 15 | 8 | 1.000 |
-| Block 16 | 17 | 0.993 |
-| Block 17 | 6 | 1.000 |
-| Block 18 | 16 | 0.983 |
+| Block 11 | 20 | 0.805 |
+| Block 12 | 8 | 1.000 |
+| Block 13 | 11 | 0.982 |
+| Block 14 | 8 | 1.000 |
+| Block 15 | 17 | 0.993 |
+| Block 16 | 6 | 1.000 |
+| Block 17 | 16 | 0.983 |
 
 The 18 blocks likely correspond to **school classes** — the internal density close to 1.0 indicates that students within the same class interact with almost everyone else in their class.
 
@@ -629,9 +629,9 @@ The normalized version is obtained by multiplying by $(n-1)$.
 
 #### Betweenness Centrality
 
-$$\zeta_i^{b}=\sum_{j>i}\sum_{k>j}\frac{n_{jk}^{i}}{g_{jk}}$$
+$$\zeta_i^{b}=\sum_{j \neq i}\sum_{k \neq i, k > j}\frac{n_{jk}^{i}}{g_{jk}}$$
 
-where $n_{jk}^{i}$ is the number of geodesic paths between $j$ and $k$ passing through $i$, and $g_{jk}$ is the total number of geodesic paths between $j$ and $k$.
+where $n_{jk}^{i}$ is the number of geodesic paths between $j$ and $k$ passing through $i$, and $g_{jk}$ is the total number of geodesic paths between $j$ and $k$. The sum runs over all pairs $(j,k)$ with $j < k$ and both different from $i$.
 
 #### Network Centralization (Freeman, 1979)
 
@@ -824,14 +824,6 @@ Airoldi, E. M., Blei, D. M., Fienberg, S. E., & Xing, E. P. (2008). Mixed member
 ### Exponential Random Graph Models
 
 Frank, O., & Strauss, D. (1986). Markov graphs. *Journal of the American Statistical Association*, *81*(395), 832–842. https://doi.org/10.1080/01621459.1986.10478342
-
-### Spatial Models
-
-Lindgren, F. (2010). Continuous domain spatial models in R-INLA. *Environmental and Ecological Statistics*, *18*, 165–183. https://doi.org/10.1007/s10651-009-0115-1
-
-### Applied Network Analysis
-
-Gulati, R., & Gargiulo, M. (1999). Where do interorganizational networks come from? *American Journal of Sociology*, *104*(5), 1439–1493. https://doi.org/10.1086/210179
 
 ### Dynamic Networks
 
