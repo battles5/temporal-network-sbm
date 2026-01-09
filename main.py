@@ -246,11 +246,18 @@ For more information, see README.md
         print("-" * 40)
         
         # Build time windows dict format for hypergraph analysis
-        hg_time_windows = [{'t_start': w['t_start'], 't_end': w['t_end']} 
+        # time_windows is a list of (t_start, t_end, edges) tuples
+        hg_time_windows = [{'t_start': w[0], 't_end': w[1]} 
                           for w in time_windows]
         
+        # Convert temporal_edges dict to list of (timestamp, node1, node2)
+        temporal_edges_list = []
+        for ts, edges in temporal_edges.items():
+            for n1, n2 in edges:
+                temporal_edges_list.append((ts, n1, n2))
+        
         hypergraph_results = run_hypergraph_analysis(
-            temporal_edges,
+            temporal_edges_list,
             hg_time_windows,
             min_group_size=config['hypergraph']['min_group_size'],
             max_group_size=config['hypergraph']['max_group_size'],
