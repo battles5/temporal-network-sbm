@@ -463,6 +463,8 @@ The network is **slightly centralized** overall. The low betweenness centralizat
 | 9 | 1890 | 0.498 |
 | 10 | 1765 | 0.490 |
 
+> **Note**: Node IDs (1551, 1780, etc.) are the original participant identifiers from the SocioPatterns dataset, not sequential indices. The 242 unique participants have IDs ranging from 1426 to 1922.
+
 These individuals had contact with more than 50% of the school population during the observation period.
 
 ---
@@ -506,9 +508,11 @@ The SBM infers the latent community structure using Bayesian inference with the 
 
 The 18 blocks likely correspond to **school classes** — the internal density close to 1.0 indicates that students within the same class interact with almost everyone else in their class.
 
+> **Note on density = 1.0**: An internal density of 1.0 means the block is a *complete subgraph* (clique) — every pair of nodes within the block has an edge. This is expected in school classes where all students had at least one contact during the two-day observation period.
+
 ![Block Connection Matrix](docs/sbm_block_matrix.png)
 
-*Figure: Connection Probability Matrix $\hat{\Pi}$, where $\hat{\pi}_{ql}$ represents the estimated probability of an edge between a node in block $q$ and a node in block $\ell$.*
+*Figure: Connection Probability Matrix Π̂, where π̂ⱼₗ represents the estimated probability of an edge between a node in block q and a node in block ℓ.*
 
 The block connection matrix shows:
 - **Strong diagonal** (assortative structure): students primarily interact within their class
