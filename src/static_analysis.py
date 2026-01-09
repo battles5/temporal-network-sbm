@@ -163,11 +163,11 @@ def compute_centrality(g: Graph) -> Tuple[dict, dict]:
     degree_centrality = degrees / (n - 1) if n > 1 else degrees
     
     # Betweenness centrality
+    # Note: graph-tool's betweenness() with norm=True (default) already normalizes
+    # by dividing by (n-1)(n-2)/2, so values are in [0, 1]
     vb, eb = betweenness(g)
     betweenness_vals = vb.a.copy()
-    # Normalize
-    norm_factor = 2.0 / ((n - 1) * (n - 2)) if n > 2 else 1
-    betweenness_norm = betweenness_vals * norm_factor
+    # No additional normalization needed - graph-tool already normalizes
     
     # Closeness centrality
     closeness_vals = closeness(g).a.copy()
@@ -188,8 +188,18 @@ def compute_centrality(g: Graph) -> Tuple[dict, dict]:
         max_possible = (n - 1) * (n - 2) / (n - 1) if n > 2 else 1
         return sum_diff / max_possible if max_possible > 0 else 0.0
     
+    def freeman_centralization_betweenness(values):
+        """Compute Freeman's centralization for betweenness (already normalized [0,1])."""
+        values = np.array(values)
+        max_val = float(np.max(values))
+        sum_diff = float(np.sum(max_val - values))
+        # For normalized betweenness in [0,1], max possible sum of differences
+        # is (n-1) (star graph: center=1, all others=0)
+        max_possible = n - 1
+        return sum_diff / max_possible if max_possible > 0 else 0.0
+    
     centr_degree = float(freeman_centralization(degree_centrality))
-    centr_betweenness = float(freeman_centralization(betweenness_norm))
+    centr_betweenness = float(freeman_centralization_betweenness(betweenness_vals))
     centr_closeness = float(freeman_centralization(closeness_vals[~np.isnan(closeness_vals)]))
     
     centrality_stats = {
@@ -200,7 +210,7 @@ def compute_centrality(g: Graph) -> Tuple[dict, dict]:
     
     node_centrality = {
         'degree': degree_centrality,
-        'betweenness': betweenness_norm,
+        'betweenness': betweenness_vals,
         'closeness': closeness_vals,
         'eigenvector': eigenvector_vals
     }

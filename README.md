@@ -441,10 +441,10 @@ Network visualization with node sizes proportional to degree centrality. The gra
 | Centralization Measure | Value | Interpretation |
 |------------------------|-------|----------------|
 | **Degree** | 0.2731 | Moderately centralized |
-| **Betweenness** | 0.0000 | Decentralized |
+| **Betweenness** | 0.0103 | Low centralization |
 | **Closeness** | 0.1128 | Slightly centralized |
 
-The network is **slightly centralized** overall. The near-zero betweenness centralization is notable — it means no single node dominates shortest paths, which is expected in a dense network with short diameter. The moderate degree centralization indicates some individuals are more socially active than others.
+The network is **slightly centralized** overall. The low betweenness centralization (~1%) indicates no single node dominates shortest paths, which is expected in a dense network with short diameter. The moderate degree centralization indicates some individuals are more socially active than others.
 
 ---
 
