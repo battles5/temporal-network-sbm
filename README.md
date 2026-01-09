@@ -98,18 +98,19 @@ All analyses are accompanied by publication-ready visualizations:
 
 The core of this toolkit relies on `graph-tool`, a highly efficient C++ library for network analysis. It cannot be installed via pip.
 
-**Option A: Conda (recommended for most users)**
+**Conda (recommended — works reliably on Linux, macOS, and WSL)**
 ```bash
 conda create -n netsbm python=3.10
 conda activate netsbm
 conda install -c conda-forge graph-tool
 ```
 
-**Option B: Ubuntu/Debian via apt (recommended for WSL)**
+**Alternative: Ubuntu/Debian via apt (may require additional configuration)**
 ```bash
 sudo apt update
 sudo apt install python3-graph-tool
 ```
+> ⚠️ The `apt` method may fail on some Ubuntu versions. If you encounter issues, use Conda instead.
 
 **Option C: Docker**
 ```bash
@@ -131,43 +132,66 @@ pip install -r requirements.txt
 ### Step 3: Clone this repository
 
 ```bash
-git clone https://github.com/yourusername/temporal-network-sbm.git
+git clone https://github.com/battles5/temporal-network-sbm.git
 cd temporal-network-sbm
 ```
 
-### Windows Users
+### Windows Users (WSL)
 
 This toolkit requires **WSL** (Windows Subsystem for Linux):
 
 1. Open PowerShell as Administrator and run: `wsl --install`
-2. Install Ubuntu 24.04 from Microsoft Store
-3. Inside WSL, install graph-tool: `sudo apt install python3-graph-tool`
+2. Install Ubuntu from Microsoft Store (22.04 or 24.04)
+3. Inside WSL, install Miniconda and then graph-tool via conda-forge:
+   ```bash
+   wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+   bash Miniconda3-latest-Linux-x86_64.sh
+   conda create -n netsbm python=3.10
+   conda activate netsbm
+   conda install -c conda-forge graph-tool
+   ```
 4. Run the toolkit from within WSL
 
 ---
 
 ## Quick Start
 
+### Dataset
+
+> **Note**: This repository includes a minimal sample dataset for testing. For real analysis, download a dataset from [SocioPatterns](http://www.sociopatterns.org/datasets/) or [Netzschleuder](https://networks.skewed.de/).
+
+The toolkit expects a simple edge list format:
+```
+timestamp  node1  node2
+0          1      2
+0          2      3
+20         1      3
+...
+```
+
 ### Basic Usage
 
 ```bash
-python main.py --input &lt;data_file&gt; --output &lt;output_dir&gt;
+python main.py --input <data_file> --output <output_dir>
 ```
 
 ### Example Commands
 
 ```bash
-# Full analysis with default settings
-python main.py --input data/contacts.dat --output results/
+# Test with included sample dataset
+python main.py --input data/sample_contacts.dat --output results/
+
+# Full analysis on LyonSchool (download from SocioPatterns first)
+python main.py --input data/tij_LyonSchool.dat --output results/
 
 # With custom configuration
-python main.py --input data.dat --output results/ --config my_config.yaml
+python main.py --input data/mydata.dat --output results/ --config my_config.yaml
 
 # Generate network animation (resource-intensive)
-python main.py --input data.dat --output results/ --animate
+python main.py --input data/mydata.dat --output results/ --animate
 
 # Skip dynamic SBM for faster execution
-python main.py --input data.dat --output results/ --no-dynamic-sbm
+python main.py --input data/mydata.dat --output results/ --no-dynamic-sbm
 ```
 
 ### Command Line Arguments

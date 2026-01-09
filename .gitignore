@@ -96,7 +96,9 @@ docs/*.txt
 animation_frames/
 
 # Data files (user should provide their own)
-data/
+data/*
+!data/.gitkeep
+!data/sample_contacts.dat
 
 # IDE
 .vscode/
