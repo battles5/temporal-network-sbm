@@ -130,6 +130,9 @@ conda install -c conda-forge graph-tool
 **Alternative: Ubuntu/Debian via apt (may require additional configuration)**
 ```bash
 sudo apt update
+sudo apt install -y software-properties-common
+sudo add-apt-repository universe
+sudo apt update
 sudo apt install python3-graph-tool
 ```
 > ⚠️ The `apt` method may fail on some Ubuntu versions. If you encounter issues, use Conda instead.
@@ -148,6 +151,8 @@ With your conda environment activated:
 conda activate netsbm
 pip install -r requirements.txt
 ```
+
+`requirements.txt` includes NumPy, SciPy, Matplotlib, pandas, PyYAML, and NetworkX (used for clique enumeration in hypergraph analysis).
 
 > ⚠️ **Important**: Always install packages inside the activated conda environment. Do not use `sudo` with pip or conda.
 
@@ -187,6 +192,14 @@ This toolkit requires **WSL** (Windows Subsystem for Linux):
 - [Netzschleuder: sp_primary_school](https://networks.skewed.de/net/sp_primary_school)
 
 Other compatible datasets: SFHH, InVS, Thiers, Hospital (all from [SocioPatterns](http://www.sociopatterns.org/datasets/)).
+
+**Setup**: Create the `data/` folder and place your downloaded dataset there:
+
+```bash
+mkdir -p data
+# Place the downloaded dataset here, e.g.:
+# data/tij_LyonSchool.dat
+```
 
 The toolkit expects a simple edge list format:
 ```
@@ -1013,7 +1026,7 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 ### Third-Party Licenses
 
-This project depends on the following open-source libraries:
+For the full Python dependency list, see `requirements.txt`.
 
 | Library | License | Usage |
 |---------|---------|-------|
@@ -1021,6 +1034,9 @@ This project depends on the following open-source libraries:
 | [NumPy](https://numpy.org/) | BSD | Numerical computations |
 | [SciPy](https://scipy.org/) | BSD | Scientific computing |
 | [Matplotlib](https://matplotlib.org/) | PSF/BSD | Visualization |
+| [pandas](https://pandas.pydata.org/) | BSD | Data manipulation |
+| [PyYAML](https://pyyaml.org/) | MIT | Configuration parsing |
+| [NetworkX](https://networkx.org/) | BSD | Clique enumeration (hypergraph) |
 
 These libraries retain their original licenses. Our MIT license applies only to the original code in this repository.
 
