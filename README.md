@@ -178,7 +178,7 @@ This toolkit requires **WSL** (Windows Subsystem for Linux):
 
 ### Dataset
 
-> **Note**: This repository includes a minimal sample dataset for testing. For real analysis, download a dataset from [SocioPatterns](http://www.sociopatterns.org/datasets/) or [Netzschleuder](https://networks.skewed.de/).
+> **Note**: This repository does not include datasets. Download a temporal network dataset from [SocioPatterns](http://www.sociopatterns.org/datasets/) (e.g., LyonSchool, SFHH, InVS) or [Netzschleuder](https://networks.skewed.de/) before running the analysis.
 
 The toolkit expects a simple edge list format:
 ```
@@ -198,26 +198,23 @@ python main.py --input <data_file> --output <output_dir>
 ### Example Commands
 
 ```bash
-# Test with included sample dataset
-python main.py --input data/sample_contacts.dat --output results/
-
-# Full analysis on LyonSchool (download from SocioPatterns first)
-python main.py --input data/tij_LyonSchool.dat --output results/
+# Run analysis on LyonSchool (download from SocioPatterns first)
+python main.py --input data/tij_LyonSchool.dat --output output/
 
 # With custom configuration
-python main.py --input data/mydata.dat --output results/ --config my_config.yaml
+python main.py --input data/mydata.dat --output output/ --config my_config.yaml
 
 # Generate network animation (resource-intensive)
-python main.py --input data/mydata.dat --output results/ --animate
+python main.py --input data/mydata.dat --output output/ --animate
 
 # Skip dynamic SBM for faster execution
-python main.py --input data/mydata.dat --output results/ --no-dynamic-sbm
+python main.py --input data/mydata.dat --output output/ --no-dynamic-sbm
 
 # Enable hypergraph group extraction (clique analysis)
-python main.py --input data/mydata.dat --output results/ --hypergraph
+python main.py --input data/mydata.dat --output output/ --hypergraph
 
 # Hypergraph with custom group size limits
-python main.py --input data/mydata.dat --output results/ --hypergraph --min-group-size 4 --max-group-size 15
+python main.py --input data/mydata.dat --output output/ --hypergraph --min-group-size 4 --max-group-size 15
 ```
 
 ### Command Line Arguments
@@ -346,13 +343,13 @@ The LyonSchool dataset captures face-to-face interactions between students and t
 ```bash
 # Standard analysis (SBM + Dynamic SBM)
 python main.py \
-  --input /path/to/tij_LyonSchool.dat \
-  --output results_lyonschool/
+  --input data/tij_LyonSchool.dat \
+  --output output/
 
 # With hypergraph group extraction
 python main.py \
-  --input /path/to/tij_LyonSchool.dat \
-  --output results_lyonschool/ \
+  --input data/tij_LyonSchool.dat \
+  --output output/ \
   --hypergraph
 ```
 
@@ -554,7 +551,7 @@ All 242 nodes changed blocks at least once, reflecting the natural dynamics of s
 When running with `--hypergraph`, the toolkit extracts group interactions by identifying maximal cliques in each time window.
 
 ```bash
-python main.py --input tij_LyonSchool.dat --output results/ --hypergraph
+python main.py --input data/tij_LyonSchool.dat --output output/ --hypergraph
 ```
 
 ![Group Size Distribution](docs/group_size_distribution.png)
@@ -563,9 +560,11 @@ python main.py --input tij_LyonSchool.dat --output results/ --hypergraph
 
 | Hypergraph Metric | Value |
 |-------------------|-------|
-| **Total groups extracted** | ~15,000–25,000 (varies by parameters) |
+| **Total groups extracted** | 73,950 |
 | **Most common group size** | 3 (triangles) |
 | **Largest groups observed** | 10–15 individuals |
+| **Windows with groups** | 1,028 / 1,039 |
+| **Analysis time** | ~3 seconds |
 
 The group size distribution typically follows a **power-law-like decay**: many small groups (triads, tetrads) and progressively fewer large groups. This is consistent with the observation that full-class interactions are rare, while small-group conversations are frequent.
 
