@@ -59,7 +59,7 @@ The foundation of any network analysis begins with understanding the basic struc
 Moving beyond heuristic community detection, this toolkit uses principled Bayesian inference:
 
 - Automatic detection of optimal number of blocks via **Minimum Description Length (MDL)**
-- Block membership assignment with uncertainty quantification
+- Hard partition of nodes into blocks (MAP assignment from MCMC inference)
 - Inter-block connection probability matrix Π
 - Internal block density analysis
 - Comparison with degree-corrected variants
@@ -104,6 +104,8 @@ All analyses are accompanied by publication-ready visualizations:
 - **Group size over time** (median/IQR per window)
 - **Animated network evolution** (optional, 4K resolution)
 
+See the [Output](#output) section below for exact filenames (e.g., `figures/sbm_block_matrix.png`, `figures/dynamic_sbm_transitions.png`, `figures/group_size_distribution.png`).
+
 ---
 
 ## Installation
@@ -140,14 +142,14 @@ docker run -it tiagopeixoto/graph-tool python3
 
 ### Step 2: Install Python dependencies
 
-```bash
-pip install numpy scipy matplotlib pyyaml
-```
+With your conda environment activated:
 
-Or using the provided requirements file:
 ```bash
+conda activate netsbm
 pip install -r requirements.txt
 ```
+
+> ⚠️ **Important**: Always install packages inside the activated conda environment. Do not use `sudo` with pip or conda.
 
 ### Step 3: Clone this repository
 
@@ -178,7 +180,13 @@ This toolkit requires **WSL** (Windows Subsystem for Linux):
 
 ### Dataset
 
-> **Note**: This repository does not include datasets. Download a temporal network dataset from [SocioPatterns](http://www.sociopatterns.org/datasets/) (e.g., LyonSchool, SFHH, InVS) or [Netzschleuder](https://networks.skewed.de/) before running the analysis.
+> **Note**: This repository does not include datasets. Download a temporal network dataset before running the analysis.
+
+**Recommended: LyonSchool (primary school face-to-face contacts)**
+- [SocioPatterns: Primary School Dataset](http://www.sociopatterns.org/datasets/primary-school-temporal-network-data/)
+- [Netzschleuder: sp_primary_school](https://networks.skewed.de/net/sp_primary_school)
+
+Other compatible datasets: SFHH, InVS, Thiers, Hospital (all from [SocioPatterns](http://www.sociopatterns.org/datasets/)).
 
 The toolkit expects a simple edge list format:
 ```
@@ -356,6 +364,8 @@ python main.py \
 ### Results Summary
 
 Below are the complete results obtained from our analysis pipeline.
+
+> **Reproducibility note**: These values are from one run with default settings (window size 300s, step 60s). Results may vary slightly depending on MCMC initialization and parameter choices.
 
 ---
 
