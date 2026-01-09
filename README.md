@@ -4,11 +4,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![graph-tool](https://img.shields.io/badge/graph--tool-2.59-green.svg)](https://graph-tool.skewed.de/)
 
-A comprehensive Python toolkit for analyzing **temporal (dynamic) networks** using **Stochastic Block Models (SBM)**.
+A comprehensive Python toolkit for analyzing **temporal (dynamic) networks** using **Stochastic Block Models (SBM)** and **hypergraph group extraction**.
 
 This project was developed as an examination work for the course Network Data Analysis taught by Prof. Maria Francesca Marino at the University of Florence, within the Master's program in Data Science and Statistical Learning MD2SL.
 
-The toolkit implements rigorous statistical methods for network community detection, combining classical network analysis with modern inference-based approaches. It provides a complete pipeline from raw temporal edge data to publication-quality visualizations and comprehensive statistical reports.
+The toolkit implements rigorous statistical methods for network community detection, combining classical network analysis with modern inference-based approaches. It also includes an optional hypergraph analysis module that extracts group interactions via maximal clique enumeration, following the methodology of Iacopini et al. (2022). The complete pipeline transforms raw temporal edge data into publication-quality visualizations and comprehensive statistical reports.
 
 ![Network Animation Example](docs/network_animation.gif)
 
@@ -17,6 +17,11 @@ The toolkit implements rigorous statistical methods for network community detect
 ## Table of Contents
 
 1. [Features](#features)
+   - [Static Network Analysis](#static-network-analysis)
+   - [Stochastic Block Model (SBM)](#stochastic-block-model-sbm)
+   - [Dynamic Stochastic Block Model](#dynamic-stochastic-block-model)
+   - [Hypergraph Group Extraction (Cliques)](#hypergraph-group-extraction-cliques)
+   - [Visualization Suite](#visualization-suite)
 2. [Installation](#installation)
 3. [Quick Start](#quick-start)
 4. [Input Data Format](#input-data-format)
@@ -339,9 +344,16 @@ The LyonSchool dataset captures face-to-face interactions between students and t
 ### Running the Analysis
 
 ```bash
+# Standard analysis (SBM + Dynamic SBM)
 python main.py \
   --input /path/to/tij_LyonSchool.dat \
   --output results_lyonschool/
+
+# With hypergraph group extraction
+python main.py \
+  --input /path/to/tij_LyonSchool.dat \
+  --output results_lyonschool/ \
+  --hypergraph
 ```
 
 ### Results Summary
@@ -534,6 +546,32 @@ The transition matrix shows block-to-block movement probabilities. Key observati
 | Nodes that changed blocks | 242 (all) |
 
 All 242 nodes changed blocks at least once, reflecting the natural dynamics of school life — students temporarily join different groups during breaks, lunch, or cross-class activities.
+
+---
+
+#### Hypergraph Group Extraction (Optional)
+
+When running with `--hypergraph`, the toolkit extracts group interactions by identifying maximal cliques in each time window.
+
+```bash
+python main.py --input tij_LyonSchool.dat --output results/ --hypergraph
+```
+
+![Group Size Distribution](docs/group_size_distribution.png)
+
+*Figure: Distribution of group sizes extracted via clique enumeration. Left: linear scale; Right: log scale.*
+
+| Hypergraph Metric | Value |
+|-------------------|-------|
+| **Total groups extracted** | ~15,000–25,000 (varies by parameters) |
+| **Most common group size** | 3 (triangles) |
+| **Largest groups observed** | 10–15 individuals |
+
+The group size distribution typically follows a **power-law-like decay**: many small groups (triads, tetrads) and progressively fewer large groups. This is consistent with the observation that full-class interactions are rare, while small-group conversations are frequent.
+
+![Group Size Over Time](docs/group_size_over_time.png)
+
+*Figure: Median group size per time window with interquartile range (IQR). The pattern mirrors overall activity — larger groups form during peak school hours.*
 
 ---
 
