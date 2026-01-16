@@ -165,13 +165,17 @@ def plot_community_network(
     """
     Plot network colored by SBM blocks.
     """
-    n_blocks = len(np.unique(block_assignment))
+    unique_blocks = np.unique(block_assignment)
+    n_blocks = len(unique_blocks)
+    # Map block IDs to consecutive indices for proper color distribution
+    block_to_idx = {block: idx for idx, block in enumerate(unique_blocks)}
     cmap = plt.cm.Set2 if n_blocks <= 8 else plt.cm.tab20
     
     vcolor = g.new_vertex_property("vector<double>")
     for v in g.vertices():
         block = block_assignment[int(v)]
-        rgba = cmap(block / max(n_blocks - 1, 1))
+        idx = block_to_idx[block]
+        rgba = cmap(idx / max(n_blocks - 1, 1))
         vcolor[v] = list(rgba)
     
     pos = sfdp_layout(g, K=1.5)
