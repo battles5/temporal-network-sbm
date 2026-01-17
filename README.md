@@ -37,74 +37,41 @@ The toolkit implements rigorous statistical methods for network community detect
 
 ## Features
 
-This toolkit provides a comprehensive suite of network analysis methods, structured around three main pillars: static network analysis, stochastic block model inference, and temporal dynamics.
+This toolkit provides a comprehensive suite of network analysis methods, structured around three principal pillars: static network analysis, stochastic block model inference, and temporal dynamics. Each component has been designed to offer rigorous statistical foundations whilst maintaining computational efficiency and ease of use.
 
 ### Static Network Analysis
 
-The foundation of any network analysis begins with understanding the basic structural properties:
+The foundation of any network analysis begins with a thorough understanding of basic structural properties. The toolkit computes global statistics including the number of nodes, edges, network density, and the identification of connected components. Distance metrics such as network diameter and average path length provide insight into the overall navigability of the graph. Degree analysis encompasses the full distribution of node degrees alongside summary statistics including mean, standard deviation, minimum, maximum, and median values.
 
-- **Global statistics**: nodes, edges, density, connected components
-- **Distance metrics**: diameter, average path length
-- **Degree analysis**: distribution, moments (mean, std, min, max, median)
-- **Clustering**: local clustering coefficient, global transitivity
-- **Centrality measures**: 
-  - Degree centrality
-  - Betweenness centrality
-  - Closeness centrality  
-  - Eigenvector centrality
-- **Network centralization** using Freeman's index
+Clustering behaviour is assessed through both the local clustering coefficient and the global transitivity measure, offering complementary perspectives on triadic closure within the network. The toolkit further implements a comprehensive suite of centrality measures: degree centrality captures immediate connectivity, betweenness centrality quantifies the extent to which nodes lie on shortest paths between others, closeness centrality measures the average distance from each node to all others, and eigenvector centrality identifies nodes connected to other well-connected nodes. Finally, network centralisation is computed using Freeman's index, which quantifies the extent to which the network structure is dominated by a single node or small group of nodes.
 
 ### Stochastic Block Model (SBM)
 
-Moving beyond heuristic community detection, this toolkit uses principled Bayesian inference:
+Moving beyond heuristic community detection methods, this toolkit employs principled Bayesian inference for network partitioning. The optimal number of blocks is determined automatically through the **Minimum Description Length (MDL)** criterion, which balances model complexity against goodness of fit. Nodes are assigned to blocks via a hard partition derived from the maximum a posteriori (MAP) estimate obtained through Markov Chain Monte Carlo (MCMC) inference.
 
-- Automatic detection of optimal number of blocks via **Minimum Description Length (MDL)**
-- Hard partition of nodes into blocks (MAP assignment from MCMC inference)
-- Inter-block connection probability matrix Π
-- Internal block density analysis
-- **ICL** (Integrated Classification Likelihood) for model comparison
+The inter-block connection probability matrix Π characterises the propensity for edges to form between and within blocks, whilst internal block density analysis reveals the cohesiveness of each community. For comparison with alternative model selection criteria, the **Integrated Classification Likelihood (ICL)** is also computed.
 
 ### Dynamic Stochastic Block Model
 
-For temporal networks, we implement a sliding-window approach inspired by the `dynsbm` methodology:
+For temporal networks, the toolkit implements a sliding-window approach inspired by the `dynsbm` methodology. Temporal data are partitioned into overlapping time windows, with an independent SBM fitted to each snapshot. A critical challenge in this setting is the correspondence problem: block labels are arbitrary within each window, making direct comparison across time points problematic. This is addressed through **label alignment** using the Hungarian algorithm, which finds the optimal permutation of labels to maximise consistency between consecutive windows.
 
-- Partition temporal data into overlapping time windows
-- Independent SBM fits per window
-- **Label alignment** across windows using the Hungarian algorithm
-- **Transition probability matrix** P(b_{t+1} | b_t)
-- Block stability metrics
-- Identification of **mobile nodes** (nodes frequently changing blocks)
+The aligned block assignments enable the computation of a **transition probability matrix** $P(b_{t+1} | b_t)$, which characterises how nodes move between communities over time. Block stability metrics quantify the persistence of community structure, whilst the identification of **mobile nodes**—those individuals who frequently change block membership—reveals the dynamic core of the network.
 
 ### Hypergraph Group Extraction (Cliques)
 
-Many real-world social interactions involve more than two individuals simultaneously. While temporal edge lists record only pairwise contacts, we can approximate **higher-order group interactions** by extracting cliques from aggregated time windows, following the approach of Iacopini et al. (2022).
+Many real-world social interactions involve more than two individuals simultaneously. Whilst temporal edge lists record only pairwise contacts, it is possible to approximate **higher-order group interactions** by extracting cliques from aggregated time windows, following the methodology of Iacopini et al. (2022).
 
-**Key idea**: Within a time window, if individuals A, B, and C all interact pairwise (A↔B, B↔C, A↔C), they likely participated in a group interaction. This corresponds to a clique (complete subgraph) in the contact network.
+The underlying rationale is straightforward: within a given time window, if individuals A, B, and C all interact pairwise (A↔B, B↔C, A↔C), they have likely participated in a group interaction. This pattern corresponds to a clique—that is, a complete subgraph—in the contact network. The toolkit extracts **maximal cliques** from each time-window snapshot, where each clique of size k represents a k-person group interaction, or equivalently, a hyperedge of order k. From these extractions, the distribution of group sizes across all windows is computed, and the temporal evolution of group sizes is tracked throughout the observation period.
 
-- Extract **maximal cliques** from each time-window snapshot
-- Each clique of size k represents a k-person group interaction (hyperedge)
-- Compute the **distribution of group sizes** across all windows
-- Track how group sizes evolve over time
+This analysis is optional and may be enabled with the `--hypergraph` flag.
 
-This analysis is optional and can be enabled with the `--hypergraph` flag.
+### Visualisation Suite
 
-### Visualization Suite
+All analyses are accompanied by publication-ready visualisations designed to communicate results effectively. For degree analysis, both linear and log-log scale distributions are produced. Centrality measures are presented through comparison scatter plots alongside network graphs where node sizes reflect centrality values. The SBM results are visualised through community structure diagrams and block connection probability heatmaps.
 
-All analyses are accompanied by publication-ready visualizations:
+Temporal aspects of the data are captured through activity timelines, whilst the dynamic SBM results are presented via transition heatmaps and block evolution plots. When hypergraph analysis is enabled, additional figures display the group size distribution and the temporal trajectory of group sizes (median and interquartile range per window). An optional animated network evolution visualisation is also available, with configurable resolution settings.
 
-- Degree distribution (linear + log-log scale)
-- Centrality comparison scatter plots
-- Network graph with centrality-based node sizing
-- SBM community structure visualization
-- Block connection probability heatmap
-- Temporal activity timeline
-- Dynamic SBM transition heatmap
-- Block evolution over time
-- **Group size distribution** (when hypergraph analysis is enabled)
-- **Group size over time** (median/IQR per window)
-- **Animated network evolution** (optional, configurable resolution)
-
-See the [Output](#output) section below for exact filenames (e.g., `figures/sbm_block_matrix.png`, `figures/dynamic_sbm_transitions.png`, `figures/group_size_distribution.png`).
+Further details regarding output filenames may be found in the [Output](#output) section below.
 
 ---
 
