@@ -505,13 +505,13 @@ The toolkit also reports **partition modularity** based on the inferred SBM bloc
 | Block 16 | 6 | 1.000 |
 | Block 17 | 16 | 0.983 |
 
-The 18 blocks likely correspond to **school classes** — the internal density close to 1.0 indicates that students within the same class interact with almost everyone else in their class.
+The SBM identifies **18 blocks**, which is more than the 11 actual school classes. This finer granularity suggests the model detects **sub-groups within classes** (e.g., friend clusters, seating arrangements) or distinguishes students with different interaction patterns. The internal density close to 1.0 indicates that students within the same block interact with almost everyone else in their block.
 
 > **Note on density = 1.0**: An internal density of 1.0 means the block is a *complete subgraph* (clique) — every pair of nodes within the block has an edge. This is expected in school classes where all students had at least one contact during the two-day observation period.
 
 ![Block Connection Matrix](docs/sbm_block_matrix.png)
 
-*Figure: Connection Probability Matrix Π̂, where π̂ⱼₗ represents the estimated probability of an edge between a node in block q and a node in block ℓ.*
+*Figure: Connection Probability Matrix $\hat{\Pi}$, where $\hat{\pi}_{q\ell}$ represents the estimated probability of an edge between a node in block $q$ and a node in block $\ell$.*
 
 The block connection matrix shows:
 - **Strong diagonal** (assortative structure): students primarily interact within their class
@@ -699,6 +699,8 @@ $$R = \frac{\sum_{ij} y_{ij}y_{ji}}{m}$$
 
 where $m$ is the number of observed ties.
 
+> *Note: Reciprocity applies only to directed networks. The LyonSchool network analysed in this project is undirected, so reciprocity is not computed.*
+
 #### Transitivity / Clustering
 
 For undirected networks, transitivity measures how much "friends of friends" tend to be friends.
@@ -834,6 +836,8 @@ $$ICL_{\text{pen}} = \log p(y,\tilde z) - \frac{Q-1}{2}\log n - \frac{Q(Q+1)}{4}
 where the penalty terms correct for the number of free parameters in $\alpha$ (block proportions) and $\pi$ (connection probabilities).
 
 > **Implementation note**: The toolkit computes **both** MDL (via `graph-tool`'s MCMC inference, used for model fitting) **and** the penalized ICL (as defined above, for comparison with course material). Both are reported in the output.
+>
+> *Note on inference method*: The course covers Variational EM for SBM inference. This toolkit uses `graph-tool`'s MCMC implementation, which achieves similar results via Markov Chain Monte Carlo sampling rather than variational approximation.
 
 #### Extensions to Valued Networks
 
@@ -876,9 +880,9 @@ The toolkit distinguishes between two types of assortativity:
 
 When **external node attributes** are available (e.g., school class labels in the 5-column format `t n1 n2 c1 c2`), the toolkit computes the **true assortativity coefficient** based on the mixing matrix:
 
-$$r = \frac{\text{Tr}(e) - \|e^2\|}{1 - \|e^2\|} = \frac{Q}{Q_{max}}$$
+$$r = \frac{\text{Tr}(e) - \sum_i a_i^2}{1 - \sum_i a_i^2} = \frac{Q}{Q_{max}}$$
 
-where $e_{ij}$ is the fraction of edges connecting nodes of class $i$ to class $j$.
+where $e_{ij}$ is the fraction of edges connecting nodes of class $i$ to class $j$, and $a_i = \sum_j e_{ij}$ is the fraction of edge endpoints in class $i$.
 
 This measures **real homophily**: do nodes preferentially connect to others with the same external attribute?
 
@@ -892,7 +896,7 @@ where $b_i$ is the block assignment from SBM inference.
 
 > **Important**: These are different concepts! Attribute assortativity measures true homophily based on known labels; partition modularity measures the quality of the inferred partition. For the LyonSchool dataset:
 > - **Attribute assortativity** (11 classes): $r = 0.2338$ (moderate homophily)
-> - **Partition modularity** (18 SBM blocks): $Q/Q_{max} = 0.134$ (lower because SBM over-partitions)
+> - **Partition modularity** (18 SBM blocks): $Q/Q_{max} = 0.134$ (lower due to finer granularity — 18 blocks vs 11 classes)
 
 ---
 
