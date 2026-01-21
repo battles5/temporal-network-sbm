@@ -4,11 +4,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![graph-tool](https://img.shields.io/badge/graph--tool-2.59-green.svg)](https://graph-tool.skewed.de/)
 
-A comprehensive Python toolkit for analyzing **temporal (dynamic) networks** using **Stochastic Block Models (SBM)** and **hypergraph group extraction**.
+A comprehensive Python toolkit for analysing **temporal (dynamic) networks** using **Stochastic Block Models (SBM)** and **hypergraph group extraction**.
 
-This project was developed as an examination work for the course Network Data Analysis taught by Prof. Maria Francesca Marino at the University of Florence, within the Master's program in Data Science and Statistical Learning MD2SL.
+This project was developed as an examination work for the course Network Data Analysis taught by Prof. Maria Francesca Marino at the University of Florence, within the Master's programme in Data Science and Statistical Learning MD2SL.
 
-The toolkit implements rigorous statistical methods for network community detection, combining classical network analysis with modern inference-based approaches. It also includes an optional hypergraph analysis module that extracts group interactions via maximal clique enumeration, following the methodology of Iacopini et al. (2022). The complete pipeline transforms raw temporal edge data into publication-quality visualizations and comprehensive statistical reports.
+The toolkit implements rigorous statistical methods for network community detection, combining classical network analysis with modern inference-based approaches. It also includes an optional hypergraph analysis module that extracts group interactions via maximal clique enumeration, following the methodology of Iacopini et al. (2022). The complete pipeline transforms raw temporal edge data into publication-quality visualisations and comprehensive statistical reports.
 
 ![Network Animation Example](docs/network_animation.gif)
 
@@ -21,14 +21,14 @@ The toolkit implements rigorous statistical methods for network community detect
    - [Stochastic Block Model (SBM)](#stochastic-block-model-sbm)
    - [Dynamic Stochastic Block Model](#dynamic-stochastic-block-model)
    - [Hypergraph Group Extraction (Cliques)](#hypergraph-group-extraction-cliques)
-   - [Visualization Suite](#visualization-suite)
+   - [Visualisation Suite](#visualisation-suite)
 2. [Installation](#installation)
 3. [Quick Start](#quick-start)
 4. [Input Data Format](#input-data-format)
 5. [Output](#output)
 6. [Example: LyonSchool Dataset](#example-lyonschool-dataset)
 7. [Configuration](#configuration)
-8. [Theoretical Background](#theoretical-background)
+8. [Theoretical Background](THEORY.md) ← *Separate document*
 9. [References](#references)
 10. [Acknowledgments](#acknowledgments)
 11. [License](#license)
@@ -312,7 +312,7 @@ output/
 
 ## Example: LyonSchool Dataset
 
-To demonstrate the toolkit's capabilities, we analyze the **LyonSchool** dataset from the [SocioPatterns project](http://www.sociopatterns.org/).
+To demonstrate the toolkit's capabilities, we analyse the **LyonSchool** dataset from the [SocioPatterns project](http://www.sociopatterns.org/).
 
 ### About the Dataset
 
@@ -399,7 +399,7 @@ The scatter plot reveals **strong correlation between degree and eigenvector cen
 
 ![Network with Centrality](docs/centrality_network.png)
 
-Network visualization with node sizes proportional to degree centrality. The graph reveals a relatively dense core with some peripheral nodes.
+Network visualisation with node sizes proportional to degree centrality. The graph reveals a relatively dense core with some peripheral nodes.
 
 ---
 
@@ -563,7 +563,7 @@ The transition matrix shows block-to-block movement probabilities. Key observati
 - **Some off-diagonal flow**: students occasionally interact with other classes
 - **Block stability ranges from 35% to 80%** depending on the class
 
-| Windows Analyzed | 50 |
+| Windows Analysed | 50 |
 |------------------|-----|
 | Block stability range | 0.35 – 0.80 |
 | Nodes that changed blocks | 242 (all) |
@@ -623,11 +623,11 @@ sbm:
 # Dynamic SBM parameters
 dynamic_sbm:
   enabled: true
-  max_windows: 50            # Number of windows to analyze
+  max_windows: 50            # Number of windows to analyse
   max_blocks: 10             # Max blocks per window
 
-# Visualization settings
-visualization:
+# Visualisation settings
+visualisation:
   dpi: 300
   format: "png"
 
@@ -665,316 +665,19 @@ hypergraph:
 
 ## Theoretical Background
 
-This section summarizes the mathematical foundations used in the toolkit, following the notation from the *Network Data Analysis* course (M.F. Marino).
-
-### Basic Notation
-
-We consider a network on $n$ nodes $\{1,\dots,n\}$ described by the random adjacency matrix $Y$ and its observed realization $y$.
-The element $Y_{ij}$ is the dyadic variable representing the relationship between nodes $i$ and $j$.  
-In the binary case, $Y_{ij} = 1$ if there is an edge between $i$ and $j$, and $Y_{ij} = 0$ otherwise.
-
-For undirected networks, symmetry holds: $Y_{ij}=Y_{ji}$; for directed networks, $Y_{ij}$ and $Y_{ji}$ may differ.
-
----
-
-### 1. Global Statistics: Density, Reciprocity, Transitivity
-
-#### Density
-
-The density $\rho$ is the ratio between observed ties and possible ties:
-
-$$\rho = \frac{m}{m_{\max}}$$
-
-where $m$ is the number of observed ties and $m_{\max}$ is the maximum possible number of ties.
-
-For directed networks, the denominator is $n(n-1)$; for undirected networks, $n(n-1)/2$.
-In practice, starting from $y$, the numerator is computed as $\sum_i\sum_{j\neq i} y_{ij}$ (directed) or $\sum_i\sum_{j<i} y_{ij}$ (undirected).
-Moreover, $\rho \approx \Pr(Y_{ij}=1)$, i.e., it estimates the probability of observing a tie between two randomly selected nodes.
-
-#### Reciprocity (directed networks)
-
-Reciprocity $R$ is the fraction of reciprocated ties:
-
-$$R = \frac{\sum_{ij} y_{ij}y_{ji}}{m}$$
-
-where $m$ is the number of observed ties.
-
-> *Note: Reciprocity applies only to directed networks. The LyonSchool network analysed in this project is undirected, so reciprocity is not computed.*
-
-#### Transitivity / Clustering
-
-For undirected networks, transitivity measures how much "friends of friends" tend to be friends.
-One formulation is the coefficient:
-
-$$C = \frac{\text{(closed paths of length 2)}}{\text{(paths of length 2)}}$$
-
-Equivalently, via triad census, we count the number of triangles and connected triplets (two-stars). Then:
-
-$$C = \frac{\text{(triangles)}}{\text{(triangles)} + \text{(two-stars)}}$$
-
-where connected triplets = triangles + two-stars.
-
-This can be interpreted as:
-
-$$C \approx \Pr(Y_{ih}=1 \mid Y_{ij}=1,\ Y_{jh}=1)$$
-
-thus measuring dyadic dependence.
-
----
-
-### 2. Node Centrality and Network Centralization
-
-In the course, centrality measures (for undirected, unweighted networks) are presented using the notation $\zeta$.
-
-#### Degree Centrality
-
-$$\zeta_i^{d} = \sum_{j\neq i} y_{ij}, \qquad i=1,\dots,n$$
-
-It can be normalized by dividing by $(n-1)$.
-
-#### Closeness Centrality
-
-The geodesic distance $d_{ij}$ is defined as the length of the shortest path between $i$ and $j$.
-The *farness* of node $i$ is:
-
-$$\ell_i = d_{i1}+d_{i2}+\cdots+d_{in}$$
-
-and the closeness centrality:
-
-$$\zeta_i^{c}=\frac{1}{\ell_i}$$
-
-The normalized version is obtained by multiplying by $(n-1)$.
-
-#### Betweenness Centrality
-
-$$\zeta_i^{b}=\sum_{j \neq i}\sum_{k \neq i, k > j}\frac{n_{jk}^{i}}{g_{jk}}$$
-
-where $n_{jk}^{i}$ is the number of geodesic paths between $j$ and $k$ passing through $i$, and $g_{jk}$ is the total number of geodesic paths between $j$ and $k$. The sum runs over all pairs $(j,k)$ with $j < k$ and both different from $i$.
-
-#### Network Centralization (Freeman, 1979)
-
-Given $\zeta_{\max}=\max_i \zeta_i$, the network centralization is:
-
-$$CI=\frac{\sum_{i=1}^n (\zeta_{\max}-\zeta_i)}{\max_Y \sum_{i=1}^n (\zeta_{\max}-\zeta_i)}$$
-
-where the denominator is the maximum sum achievable over all graphs of size $n$ (depends on the chosen index).
-
-> **Note**: The toolkit also includes **eigenvector centrality** as a practical extension; this measure is standard in the literature but is not among those formalized in the course slides.
-
----
-
-### 3. Stochastic Block Model (SBM)
-
-The SBM is a generative model where the probability of observing a tie between two nodes depends on latent block membership variables.
-
-#### Latent Variables
-
-Each node $i$ belongs to one of $Q$ blocks, represented by the indicator vector:
-
-$$Z_i = (Z_{i1},\dots,Z_{iQ})^\top \quad\text{where}\quad Z_{iq} = 1 \text{ if node } i \in \text{block } q, \quad 0 \text{ otherwise}, \quad \sum_q Z_{iq}=1$$
-
-The $Z_i$ are i.i.d.:
-
-$$Z_i \sim \text{Multinomial}(1,\alpha), \qquad \alpha_q=\Pr(Z_{iq}=1),\quad \sum_q \alpha_q=1$$
-
-#### Dyadic Model (binary network)
-
-Conditionally on block memberships, dyads are independent:
-
-$$\Pr(Y\mid Z)=\prod_{ij}\Pr(Y_{ij}\mid Z), \qquad \Pr(Y_{ij}\mid Z)=\Pr(Y_{ij}\mid Z_i,Z_j)$$
-
-with:
-
-$$Y_{ij}\mid(Z_{iq}=1,Z_{j\ell}=1)\sim \text{Bern}(\pi_{q\ell})$$
-
-For undirected networks, $\pi_{q\ell}=\pi_{\ell q}$.
-
-#### Estimation and Intractability
-
-Denoting $\theta=(\alpha,\pi)$ as the parameters, ML estimation requires:
-
-$$\hat\theta=\arg\max_\theta \log \Pr(Y;\theta) =\arg\max_\theta \log \sum_z \Pr(Y=y,Z=z;\theta)$$
-
-but the sum over all latent configurations $z$ grows prohibitively ($Q^n$ terms).
-
-#### Variational EM (VEM)
-
-A variational approximation of the log-likelihood is used:
-
-$$F(q(z),\theta)=\ell(\theta)-\mathrm{KL}\big[q(z),p(z\mid y;\theta)\big]$$
-
-A factorization is imposed:
-
-$$q(z)=\prod_i h(z_i;\tau_i), \qquad \tau_i=(\tau_{i1},\dots,\tau_{iQ})$$
-
-where $\tau_{iq}$ approximates $\Pr(Z_{iq}=1\mid Y=y)$.
-
-The algorithm alternates:
-1. **VE-step**: optimize $F$ with respect to $\tau_i$  
-2. **ME-step**: optimize $F$ with respect to $\alpha$ and $\pi$, with $\tau$ fixed
-
-until convergence.
-
-#### Block Assignment
-
-At convergence, node $i$ is assigned to the most probable block:
-
-$$\hat{q}_i = \arg\max_q \hat\tau_{iq}$$
-
-#### Model Selection (ICL)
-
-The number of blocks $Q$ can be selected via the **Integrated Classification Likelihood**. In the course slides, the ICL is presented as:
-
-$$ICL = \log p(y, \tilde{z})$$
-
-where $\tilde{z}$ is the MAP (maximum a posteriori) assignment of nodes to blocks. The number $Q$ is chosen to maximize this criterion.
-
-In practice, a **BIC-like penalized version** is often used to avoid overfitting:
-
-$$ICL_{\text{pen}} = \log p(y,\tilde z) - \frac{Q-1}{2}\log n - \frac{Q(Q+1)}{4}\log\frac{n(n-1)}{2}$$
-
-where the penalty terms correct for the number of free parameters in $\alpha$ (block proportions) and $\pi$ (connection probabilities).
-
-> **Implementation note**: The toolkit computes **both** MDL (via `graph-tool`'s MCMC inference, used for model fitting) **and** the penalized ICL (as defined above, for comparison with course material). Both are reported in the output.
->
-> *Note on inference method*: The course covers Variational EM for SBM inference. This toolkit uses `graph-tool`'s MCMC implementation, which achieves similar results via Markov Chain Monte Carlo sampling rather than variational approximation.
-
-#### Extensions to Valued Networks
-
-For non-binary relationships:
-- (real-valued) $Y_{ij}\mid(Z_{iq}=1,Z_{j\ell}=1)\sim \mathcal{N}(\mu_{q\ell},\sigma_{q\ell})$
-- (count) $Y_{ij}\mid(Z_{iq}=1,Z_{j\ell}=1)\sim \mathrm{Pois}(\lambda_{q\ell})$
-
----
-
-### 4. SBM vs Modularity-based Methods
-
-A common alternative to SBM is **modularity optimization** (e.g., Louvain algorithm). Modularity is defined as:
-
-$$Q = \frac{1}{2m}\sum_{ij}\left(y_{ij} - \frac{k_i k_j}{2m}\right)\delta(c_i, c_j)$$
-
-where:
-- $m$ is the total number of edges
-- $k_i$ is the degree of node $i$
-- $c_i$ is the community assignment of node $i$
-- $\delta(c_i, c_j) = 1$ if $c_i = c_j$, 0 otherwise
-
-| Aspect | SBM | Modularity (e.g., Louvain) |
-|--------|-----|----------------------------|
-| **Approach** | Generative model | Heuristic optimization |
-| **Inference** | Probabilistic (Bayesian/VEM) | Greedy algorithm |
-| **Structure detected** | Assortative AND disassortative | Only assortative |
-| **Model selection** | Principled (ICL/MDL) | Resolution limit problem |
-| **Uncertainty** | Provides posterior probabilities | Point estimate only |
-
-The SBM can detect:
-- **Assortative structure**: nodes connect within their block (communities)
-- **Disassortative structure**: nodes connect between blocks (bipartite-like)
-- **Core-periphery**: central blocks connect to all, peripheral blocks connect only to core
-
-#### Assortativity Coefficient
-
-The toolkit distinguishes between two types of assortativity:
-
-##### 1. Attribute Assortativity (True Homophily)
-
-When **external node attributes** are available (e.g., school class labels in the 5-column format `t n1 n2 c1 c2`), the toolkit computes the **true assortativity coefficient** based on the mixing matrix:
-
-$$r = \frac{\text{Tr}(e) - \sum_i a_i^2}{1 - \sum_i a_i^2} = \frac{Q}{Q_{max}}$$
-
-where $e_{ij}$ is the fraction of edges connecting nodes of class $i$ to class $j$, and $a_i = \sum_j e_{ij}$ is the fraction of edge endpoints in class $i$.
-
-This measures **real homophily**: do nodes preferentially connect to others with the same external attribute?
-
-##### 2. Partition Modularity (SBM Quality)
-
-When computing modularity based on **SBM-inferred blocks** (not external attributes), we get a measure of partition quality:
-
-$$Q_{partition} = \frac{1}{2m}\sum_{ij}\left(Y_{ij} - \frac{k_i k_j}{2m}\right)\delta(b_i, b_j)$$
-
-where $b_i$ is the block assignment from SBM inference.
-
-> **Important**: These are different concepts! Attribute assortativity measures true homophily based on known labels; partition modularity measures the quality of the inferred partition. For the LyonSchool dataset:
-> - **Attribute assortativity** (11 classes): $r = 0.2338$ (moderate homophily)
-> - **Partition modularity** (18 SBM blocks): $Q/Q_{max} = 0.134$ (lower due to finer granularity — 18 blocks vs 11 classes)
-
----
-
-### 5. Temporal Extension (Dynamic SBM) — Project Extension
-
-For temporal networks constructed from edge lists with timestamps, we adopt a sliding-window strategy:
-
-1. Segment time into overlapping windows
-2. For each window $w$, construct a snapshot $y^{(w)}$
-3. Fit an independent SBM for each $w$, obtaining $\hat\tau^{(w)}$ / partitions
-4. Solve the *label switching* problem by aligning labels across consecutive windows (Hungarian algorithm on block overlaps)
-5. Compute transition and stability statistics
-
-**This part is a project extension** (not formalized in the course slides), but maintains the same logic of latent partitioning applied to snapshots.
-
-#### Transition Matrix
-
-After alignment, we compute the transition probability matrix:
-
-$$P_{rs} = P(b_i^{(t+1)} = s \mid b_i^{(t)} = r) = \frac{|\{i : b_i^{(t)} = r \land b_i^{(t+1)} = s\}|}{|\{i : b_i^{(t)} = r\}|}$$
-
-**Interpretation**:
-- **High diagonal values**: Stable communities (nodes stay in their blocks)
-- **Off-diagonal values**: Community fluidity (nodes moving between blocks)
-
-#### Block Stability
-
-For each block $r$:
-
-$$\text{Stability}(r) = P_{rr} = P(b^{(t+1)} = r \mid b^{(t)} = r)$$
-
-#### Mobile Nodes
-
-Nodes that frequently change blocks:
-
-$$\text{Mobility}(i) = \frac{|\{t : b_i^{(t)} \neq b_i^{(t+1)}\}|}{T - 1}$$
-
-High-mobility nodes may represent:
-- Bridge individuals connecting different communities
-- Individuals with diverse social circles
-- Temporal visitors (e.g., teachers moving between classes)
-
----
-
-### 6. Hypergraph Group Extraction via Cliques
-
-Many real-world social interactions involve more than two individuals simultaneously (e.g., group conversations, classroom activities, meetings). Standard pairwise network representations may fail to capture these **higher-order interactions**.
-
-#### From Pairwise to Group Interactions
-
-Given a temporal network recorded as pairwise contacts $(t, i, j)$, we can approximate group interactions using **clique extraction** (Iacopini et al., 2022):
-
-1. For each time window $[t, t + \Delta t)$, aggregate all contacts into a snapshot graph $G_w$
-2. Extract **maximal cliques** from $G_w$
-3. Interpret each clique as a group interaction (hyperedge)
-
-A **clique** is a complete subgraph where every pair of nodes is connected. If three individuals all interacted pairwise within the same time window, they form a triangle (clique of size 3), suggesting a group interaction.
-
-#### Maximal Cliques
-
-A **maximal clique** is a clique that cannot be extended by adding any adjacent vertex. This ensures we capture the largest groups without redundancy.
-
-#### Group Size Distribution
-
-The distribution of group sizes $P(k)$ reveals the social structure:
-- **Power-law decay**: Many small groups, few large ones (typical in face-to-face data)
-- **Characteristic scale**: Preferred group sizes (e.g., classrooms, teams)
-
-$$P(k) = \frac{|\{C : |C| = k\}|}{\sum_k |\{C : |C| = k\}|}$$
-
-where $C$ denotes a clique (group) and $|C|$ its size.
-
-#### Computational Considerations
-
-Maximal clique enumeration can be computationally expensive (exponential in worst case). The toolkit implements safety measures:
-- Maximum clique size limit (`max_group_size`)
-- Maximum cliques per window (`max_cliques_per_window`)
-- Density-based skipping for overly dense graphs
+📚 **The complete theoretical background has been moved to a separate document for clarity.**
+
+➡️ **See [THEORY.md](THEORY.md)** for the full mathematical foundations, including:
+- Basic notation and adjacency matrices
+- Global statistics: density, reciprocity, transitivity
+- Node centrality and network centralisation (Freeman's index)
+- Stochastic Block Model (SBM): latent variables, VEM, ICL
+- SBM vs modularity-based methods
+- Assortativity coefficient (attribute vs partition)
+- Temporal extension (Dynamic SBM)
+- Hypergraph group extraction via cliques
+
+All notation follows the *Network Data Analysis* course (M.F. Marino, University of Florence).
 
 ---
 
@@ -1040,7 +743,7 @@ Marino, M. F. (2024–2025). *Network Data Analysis* [Lecture slides]. Master's 
 
 We would like to thank **Prof. Maria Francesca Marino** for the excellent course material. The theoretical foundations presented in her lectures on network data analysis, stochastic block models, and community detection provided the essential framework for this implementation.
 
-We also thank the developers and maintainers of the `graph-tool` library. Initially, we attempted to use **LaNet-vi** for network visualization, but despite extensive efforts, we were unable to get it to work properly (segmentation faults and compatibility issues). Thanks to `graph-tool`, we were able to complete this project entirely in Python — work that would otherwise have required R and its ecosystem of network analysis packages.
+We also thank the developers and maintainers of the `graph-tool` library. Initially, we attempted to use **LaNet-vi** for network visualisation, but despite extensive efforts, we were unable to get it to work properly (segmentation faults and compatibility issues). Thanks to `graph-tool`, we were able to complete this project entirely in Python — work that would otherwise have required R and its ecosystem of network analysis packages.
 
 ---
 
@@ -1066,7 +769,7 @@ For the full Python dependency list, see `requirements.txt`.
 | [graph-tool](https://graph-tool.skewed.de/) | LGPL v3 | Network analysis and SBM inference |
 | [NumPy](https://numpy.org/) | BSD | Numerical computations |
 | [SciPy](https://scipy.org/) | BSD | Scientific computing |
-| [Matplotlib](https://matplotlib.org/) | PSF/BSD | Visualization |
+| [Matplotlib](https://matplotlib.org/) | PSF/BSD | Visualisation |
 | [pandas](https://pandas.pydata.org/) | BSD | Data manipulation |
 | [PyYAML](https://pyyaml.org/) | MIT | Configuration parsing |
 | [NetworkX](https://networkx.org/) | BSD | Clique enumeration (hypergraph) |
