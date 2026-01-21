@@ -299,3 +299,105 @@ def run_static_analysis(
     top_nodes = get_top_nodes(node_centrality, node_list)
     
     return metrics, top_nodes, node_centrality, g
+
+def compute_attribute_assortativity(
+    g: Graph,
+    node_list: List[int],
+    node_classes: Dict[int, str],
+    node_to_idx: Dict[int, int]
+) -> Dict[str, float]:
+    """
+    Compute attribute assortativity coefficient based on node class labels.
+    
+    This is the TRUE assortativity coefficient (as defined in course slides)
+    based on EXTERNAL node attributes (e.g., school class).
+    
+    r = (sum_i e_ii - sum_i a_i * b_i) / (1 - sum_i a_i * b_i)
+    
+    For undirected networks: a_i = b_i, so:
+    r = (sum_i e_ii - sum_i a_i^2) / (1 - sum_i a_i^2)
+    
+    where:
+    - e_ij = fraction of edges connecting class i to class j
+    - a_i = fraction of edge endpoints in class i (sum_j e_ij)
+    
+    Parameters
+    ----------
+    g : Graph
+        The graph-tool Graph object
+    node_list : list
+        List of original node IDs
+    node_classes : dict
+        Mapping from node ID to class label
+    node_to_idx : dict
+        Mapping from original node ID to index
+        
+    Returns
+    -------
+    results : dict
+        Dictionary with modularity Q, Qmax, and assortativity coefficient
+    """
+    if not node_classes:
+        return {}
+    
+    m = g.num_edges()
+    if m == 0:
+        return {'attribute_modularity': 0.0, 'attribute_assortativity': 0.0}
+    
+    # Get unique classes
+    unique_classes = sorted(set(node_classes.values()))
+    class_to_idx = {c: i for i, c in enumerate(unique_classes)}
+    n_classes = len(unique_classes)
+    
+    # Build mixing matrix e_ij (fraction of edges between class i and j)
+    e_matrix = np.zeros((n_classes, n_classes))
+    
+    for edge in g.edges():
+        v1, v2 = int(edge.source()), int(edge.target())
+        n1, n2 = node_list[v1], node_list[v2]
+        
+        if n1 in node_classes and n2 in node_classes:
+            c1_idx = class_to_idx[node_classes[n1]]
+            c2_idx = class_to_idx[node_classes[n2]]
+            
+            # For undirected: count edge once, distribute to both cells
+            e_matrix[c1_idx, c2_idx] += 0.5
+            e_matrix[c2_idx, c1_idx] += 0.5
+    
+    # Normalize to get fractions
+    e_matrix /= m
+    
+    # Compute a_i = sum_j e_ij (row sums)
+    a = e_matrix.sum(axis=1)
+    
+    # Compute Tr(e) = sum_i e_ii (same-class edges)
+    trace_e = np.trace(e_matrix)
+    
+    # Compute sum_i a_i^2
+    sum_a_sq = np.sum(a ** 2)
+    
+    # Modularity Q = Tr(e) - sum_i a_i^2
+    Q = trace_e - sum_a_sq
+    
+    # Qmax = 1 - sum_i a_i^2
+    Qmax = 1 - sum_a_sq
+    
+    # Assortativity coefficient r = Q / Qmax
+    if Qmax > 0:
+        r = Q / Qmax
+    else:
+        r = 0.0
+    
+    print(f"  Attribute assortativity (based on {n_classes} classes):")
+    print(f"    Modularity Q: {Q:.4f}")
+    print(f"    Modularity Qmax: {Qmax:.4f}")
+    print(f"    Assortativity coefficient r: {r:.4f}")
+    print(f"    Classes: {unique_classes}")
+    
+    return {
+        'attribute_modularity': round(Q, 4),
+        'attribute_modularity_max': round(Qmax, 4),
+        'attribute_assortativity': round(r, 4),
+        'n_attribute_classes': n_classes,
+        'attribute_classes': unique_classes
+    }

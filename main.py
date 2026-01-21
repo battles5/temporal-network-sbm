@@ -24,12 +24,13 @@ from typing import Optional
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from src.data_loader import (
-    load_temporal_edges, 
-    aggregate_to_static, 
+    load_temporal_edges,
+    aggregate_to_static,
     create_time_windows,
-    get_dataset_info
+    get_dataset_info,
+    load_node_attributes
 )
-from src.static_analysis import run_static_analysis
+from src.static_analysis import run_static_analysis, compute_attribute_assortativity
 from src.temporal_analysis import run_temporal_analysis
 from src.sbm import run_sbm_analysis
 from src.dynamic_sbm import run_dynamic_sbm
@@ -193,6 +194,19 @@ For more information, see README.md
     metrics, top_nodes, node_centrality, g = run_static_analysis(
         n_nodes, static_edges, node_list
     )
+    
+    # Try to load node attributes (class labels) for assortativity
+    print("Checking for node class attributes...")
+    node_classes = load_node_attributes(args.input, node_list)
+    
+    if node_classes:
+        print("Computing attribute assortativity...")
+        assortativity_results = compute_attribute_assortativity(
+            g, node_list, node_classes, node_to_idx
+        )
+        metrics.update(assortativity_results)
+    else:
+        print("  No class attributes found in input file (need 5-column format: t n1 n2 c1 c2)")
     
     # Get degrees for visualization
     degrees = g.get_out_degrees(g.get_vertices())

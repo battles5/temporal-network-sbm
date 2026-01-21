@@ -447,27 +447,40 @@ The SBM infers the latent community structure using Bayesian inference with the 
 | **Optimal number of blocks** | 18 |
 | **Description Length (MDL)** | 15,827.51 bits |
 | **ICL** | -11,510.71 |
-| **Modularity Q** | 0.1247 |
-| **Modularity Q_max** | 0.9306 |
-| **Assortativity Coefficient (Q/Q_max)** | 0.134 |
 
 > **Note**: The toolkit computes both MDL (from `graph-tool`) and ICL (following course notation). MDL is used for model selection during inference; ICL is reported for comparison with the course material.
 
-##### Modularity and Assortativity
+##### Attribute Assortativity (True Assortativity Coefficient)
 
-The **modularity** $Q$ measures the fraction of edges within communities compared to the expected fraction under a null model:
+When **external node attributes** are available (e.g., school class labels), the toolkit computes the **true attribute assortativity coefficient** following the course definition:
 
-$$Q = \frac{1}{2m}\sum_{ij}\left(Y_{ij} - \frac{k_i k_j}{2m}\right)\delta(c_i, c_j)$$
+$$r = \frac{\text{Tr}(e) - \sum_i a_i^2}{1 - \sum_i a_i^2} = \frac{Q}{Q_{max}}$$
 
-The **assortativity coefficient** normalizes $Q$ by its maximum value $Q_{max}$ to give a value in $[-1, 1]$:
+where:
+- $e_{ij}$ = fraction of edges connecting class $i$ to class $j$
+- $a_i = \sum_j e_{ij}$ = fraction of edge endpoints in class $i$
+- $\text{Tr}(e) = \sum_i e_{ii}$ = fraction of edges within same class
 
-$$r = \frac{Q}{Q_{max}}$$
+| Attribute Assortativity | Value | Description |
+|-------------------------|-------|-------------|
+| **Number of classes** | 11 | 1A, 1B, 2A, 2B, 3A, 3B, 4A, 4B, 5A, 5B, Teachers |
+| **Modularity Q** | 0.2111 | Same-class edges above random |
+| **Modularity Q_max** | 0.9031 | Maximum possible |
+| **Assortativity r = Q/Q_max** | **0.2338** | Moderate assortative mixing |
 
-- $r = 1$: perfect assortative mixing (all edges within communities)
-- $r = 0$: random mixing
-- $r < 0$: disassortative mixing
+**Interpretation**: $r = 0.2338$ indicates **moderate assortative mixing** — students preferentially interact with classmates, but there is significant inter-class interaction during breaks and lunch.
 
-Our result ($r = 0.134$) indicates **weak assortative mixing**, which is expected: while students primarily interact within their class (captured by the SBM blocks), there is significant inter-class interaction during breaks and lunch.
+##### Partition Modularity (SBM Blocks)
+
+The toolkit also reports **partition modularity** based on the inferred SBM blocks (not external attributes):
+
+| Partition Metric | Value |
+|------------------|-------|
+| Partition Modularity Q | 0.1247 |
+| Partition Q_max | 0.9306 |
+| Partition Assortativity | 0.134 |
+
+> **Important distinction**: Partition modularity measures the quality of the SBM partition, while attribute assortativity measures true homophily based on known node labels. These are different concepts!
 
 ##### Block Sizes and Densities
 
@@ -855,21 +868,31 @@ The SBM can detect:
 - **Disassortative structure**: nodes connect between blocks (bipartite-like)
 - **Core-periphery**: central blocks connect to all, peripheral blocks connect only to core
 
-#### Assortativity Coefficient (Normalized Modularity)
+#### Assortativity Coefficient
 
-Following the course notation, modularity $Q$ can be normalized to obtain the **assortativity coefficient**:
+The toolkit distinguishes between two types of assortativity:
 
-$$r = \frac{Q}{Q_{max}}$$
+##### 1. Attribute Assortativity (True Homophily)
 
-where $Q_{max} = 1 - \sum_q a_q^2$ is the maximum modularity achievable (when all edges are within communities), and $a_q$ is the fraction of edge endpoints in block $q$.
+When **external node attributes** are available (e.g., school class labels in the 5-column format `t n1 n2 c1 c2`), the toolkit computes the **true assortativity coefficient** based on the mixing matrix:
 
-The assortativity coefficient $r$ has a cleaner interpretation:
-- $r \in [-1, 1]$
-- $r = 1$: perfect assortative mixing
-- $r = 0$: random mixing (no community structure)
-- $r = -1$: perfect disassortative mixing
+$$r = \frac{\text{Tr}(e) - \|e^2\|}{1 - \|e^2\|} = \frac{Q}{Q_{max}}$$
 
-> **Implementation note**: The toolkit computes both raw modularity $Q$ and the assortativity coefficient $r = Q/Q_{max}$ for the SBM partition.
+where $e_{ij}$ is the fraction of edges connecting nodes of class $i$ to class $j$.
+
+This measures **real homophily**: do nodes preferentially connect to others with the same external attribute?
+
+##### 2. Partition Modularity (SBM Quality)
+
+When computing modularity based on **SBM-inferred blocks** (not external attributes), we get a measure of partition quality:
+
+$$Q_{partition} = \frac{1}{2m}\sum_{ij}\left(Y_{ij} - \frac{k_i k_j}{2m}\right)\delta(b_i, b_j)$$
+
+where $b_i$ is the block assignment from SBM inference.
+
+> **Important**: These are different concepts! Attribute assortativity measures true homophily based on known labels; partition modularity measures the quality of the inferred partition. For the LyonSchool dataset:
+> - **Attribute assortativity** (11 classes): $r = 0.2338$ (moderate homophily)
+> - **Partition modularity** (18 SBM blocks): $Q/Q_{max} = 0.134$ (lower because SBM over-partitions)
 
 ---
 

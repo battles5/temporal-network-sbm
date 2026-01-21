@@ -38,12 +38,13 @@ def write_metrics_csv(
         all_metrics['sbm_description_length'] = sbm_results.get('description_length', 0)
         if 'icl' in sbm_results:
             all_metrics['sbm_icl'] = sbm_results.get('icl', 0)
+        # Partition modularity (based on SBM blocks, NOT external attributes)
         if 'modularity' in sbm_results:
-            all_metrics['sbm_modularity'] = sbm_results.get('modularity', 0)
+            all_metrics['sbm_partition_modularity'] = sbm_results.get('modularity', 0)
         if 'modularity_max' in sbm_results:
-            all_metrics['sbm_modularity_max'] = sbm_results.get('modularity_max', 0)
+            all_metrics['sbm_partition_modularity_max'] = sbm_results.get('modularity_max', 0)
         if 'assortativity_coefficient' in sbm_results:
-            all_metrics['sbm_assortativity_coefficient'] = sbm_results.get('assortativity_coefficient', 0)
+            all_metrics['sbm_partition_assortativity'] = sbm_results.get('assortativity_coefficient', 0)
     
     with open(output_path, 'w', newline='') as f:
         writer = csv.writer(f)
@@ -229,16 +230,45 @@ def write_summary(
         lines.append(f"Description length (MDL): {sbm_results['description_length']:.2f}")
         if 'icl' in sbm_results:
             lines.append(f"ICL (Integrated Classification Likelihood): {sbm_results['icl']:.2f}")
+        lines.append("")
+        lines.append("Partition Modularity (based on SBM blocks, NOT external attributes):")
         if 'modularity' in sbm_results:
-            lines.append(f"Modularity Q: {sbm_results['modularity']:.4f}")
+            lines.append(f"  Modularity Q: {sbm_results['modularity']:.4f}")
         if 'modularity_max' in sbm_results:
-            lines.append(f"Modularity Qmax: {sbm_results['modularity_max']:.4f}")
+            lines.append(f"  Modularity Qmax: {sbm_results['modularity_max']:.4f}")
         if 'assortativity_coefficient' in sbm_results:
-            lines.append(f"Assortativity coefficient (Q/Qmax): {sbm_results['assortativity_coefficient']:.4f}")
+            lines.append(f"  Partition assortativity (Q/Qmax): {sbm_results['assortativity_coefficient']:.4f}")
+        lines.append("  Note: This measures the quality of the SBM partition, not attribute-based assortativity.")
+        lines.append("")
         lines.append("Block sizes:")
         for block, size in sorted(sbm_results['block_sizes'].items()):
             density = sbm_results.get('block_densities', {}).get(block, 0)
             lines.append(f"  Block {block}: {size} nodes (density={density:.3f})")
+        lines.append("")
+    
+    # Attribute Assortativity (if available in metrics)
+    if 'attribute_assortativity' in metrics:
+        lines.append("-" * 40)
+        lines.append("ATTRIBUTE ASSORTATIVITY (based on external class labels)")
+        lines.append("-" * 40)
+        lines.append(f"Number of classes: {metrics.get('n_attribute_classes', 'N/A')}")
+        if 'attribute_classes' in metrics:
+            lines.append(f"Classes: {metrics['attribute_classes']}")
+        lines.append(f"Modularity Q: {metrics['attribute_modularity']:.4f}")
+        lines.append(f"Modularity Qmax: {metrics['attribute_modularity_max']:.4f}")
+        lines.append(f"Assortativity coefficient r: {metrics['attribute_assortativity']:.4f}")
+        lines.append("Interpretation:")
+        r = metrics['attribute_assortativity']
+        if r > 0.5:
+            lines.append("  Strong assortative mixing: nodes strongly prefer same-class connections")
+        elif r > 0.2:
+            lines.append("  Moderate assortative mixing: nodes prefer same-class connections")
+        elif r > 0:
+            lines.append("  Weak assortative mixing: slight preference for same-class connections")
+        elif r > -0.2:
+            lines.append("  Near-random mixing: no strong preference")
+        else:
+            lines.append("  Disassortative mixing: nodes prefer different-class connections")
         lines.append("")
     
     # Temporal

@@ -210,3 +210,84 @@ def get_dataset_info(
         'duration': timestamps[-1] - timestamps[0],
         'avg_edges_per_timestamp': total_edges / len(timestamps)
     }
+
+def load_node_attributes(
+    filepath: str,
+    node_list: List[int],
+    separator: str = "auto"
+) -> Optional[Dict[int, str]]:
+    """
+    Load node attributes (class labels) from a file with 5 columns.
+    
+    Expected format: t node1 node2 class1 class2
+    
+    Parameters
+    ----------
+    filepath : str
+        Path to the input file with class information
+    node_list : list
+        List of node IDs
+    separator : str
+        Column separator
+        
+    Returns
+    -------
+    node_classes : dict or None
+        Mapping from node ID to class label, or None if not available
+    """
+    if not os.path.exists(filepath):
+        return None
+    
+    # Detect separator
+    if separator == "auto":
+        sep = detect_separator(filepath)
+    elif separator == "tab":
+        sep = '\t'
+    else:
+        sep = None
+    
+    node_classes = {}
+    
+    with open(filepath, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+            
+            try:
+                if sep:
+                    parts = line.split(sep)
+                else:
+                    parts = line.split()
+                
+                # Check if file has class information (5 columns)
+                if len(parts) >= 5:
+                    n1 = int(parts[1])
+                    n2 = int(parts[2])
+                    c1 = parts[3]
+                    c2 = parts[4]
+                    
+                    if n1 in node_list or n1 not in node_classes:
+                        node_classes[n1] = c1
+                    if n2 in node_list or n2 not in node_classes:
+                        node_classes[n2] = c2
+                else:
+                    # No class information
+                    return None
+                    
+            except (ValueError, IndexError):
+                continue
+    
+    if not node_classes:
+        return None
+    
+    # Verify all nodes have class
+    missing = [n for n in node_list if n not in node_classes]
+    if missing:
+        print(f"  Warning: {len(missing)} nodes without class information")
+    
+    unique_classes = set(node_classes.values())
+    print(f"  Loaded class attributes for {len(node_classes)} nodes")
+    print(f"  Classes found: {sorted(unique_classes)}")
+    
+    return node_classes
