@@ -192,55 +192,124 @@ where the denominator is the maximum sum achievable over all graphs of size $n$ 
 
 ## 3. Stochastic Block Model (SBM)
 
-The SBM is a generative model where the probability of observing a tie between two nodes depends on latent block membership variables.
+The SBM is a generative model where the probability of observing a tie between two nodes depends on latent block membership variables. The probability of tie formation between network nodes is assumed to depend upon **unobserved features** of the nodes themselves. These features are captured by considering *node-specific, discrete, latent variables* that directly allow to cluster nodes (blocks).
+
+### From Blockmodels to Stochastic Blockmodels
+
+#### Blockmodels (BM) — Known Membership
+
+In the original **Blockmodel** formulation:
+- Each node $i = 1, \ldots, n$ belongs to one of $Q$ different blocks (classes)
+- Block membership **is assumed to be known**, as well as the "true" number of blocks $Q$
+- Conditional on block membership of nodes $i$ and $j$, the tie variable $Y_{ij}$ is independent of any other variable in $Y$ and follows a Bernoulli distribution
+- The *success probability* (probability of observing a tie) only depends on the corresponding block membership:
+
+$$[Y_{ij} \mid i \in q, j \in \ell] \perp\!\!\!\perp [Y_{hk} \mid h \in g, k \in m]$$
+
+$$Y_{ij} \mid (i \in q, j \in \ell) \sim \text{Bern}(\pi_{q\ell})$$
+
+For an undirected network, $\pi_{q\ell} = \pi_{\ell q}$.
+
+#### Stochastic Blockmodels (SBM) — Latent Membership
+
+The assumption that block membership is known is generally **not realistic**. The same is true about the possibility to correctly specify the "true" blocks $\{1, 2, \ldots, Q\}$. In this respect, one may consider the **stochastic counterpart** of blockmodels.
+
+Key differences from BM:
+- Blocks are **unobserved**, as well as the number of blocks $Q$
+- These can be represented by means of **independent, latent variables**
+- The model allows to identify clusters of nodes characterised by a *similar relational profile* (similar social behaviour)
+- The SBM framework allows to define a **model-based clustering procedure**
 
 ### Latent Variables
 
 Each node $i$ belongs to one of $Q$ blocks, represented by the indicator vector:
 
-$$Z_i = (Z_{i1},\dots,Z_{iQ})^\top \quad\text{where}\quad Z_{iq} = 1 \text{ if node } i \in \text{block } q, \quad 0 \text{ otherwise}, \quad \sum_q Z_{iq}=1$$
+$$Z_i = (Z_{i1},\dots,Z_{iQ})^\top \quad\text{where}\quad Z_{iq} = \begin{cases} 1 & \text{if node } i \text{ belongs to block } q \\ 0 & \text{otherwise} \end{cases}$$
+
+with the constraint $\sum_{q=1}^{Q} Z_{iq} = 1$ for all $i = 1, \ldots, n$ (each node belongs to exactly one block).
 
 The $Z_i$ are i.i.d.:
 
 $$Z_i \sim \text{Multinomial}(1,\alpha), \qquad \alpha_q=\Pr(Z_{iq}=1),\quad \sum_q \alpha_q=1$$
 
+where $\alpha = (\alpha_1, \ldots, \alpha_Q)'$ is the vector of block proportions.
+
 ### Dyadic Model (binary network)
 
-Conditionally on block memberships, dyads are independent:
+Conditional on block membership, the random variables $Y_{ij}$ are **independent of each other**, so that the corresponding joint probability can be factorised as:
 
-$$\Pr(Y\mid Z)=\prod_{ij}\Pr(Y_{ij}\mid Z), \qquad \Pr(Y_{ij}\mid Z)=\Pr(Y_{ij}\mid Z_i,Z_j)$$
+$$\Pr(Y \mid Z) = \prod_{ij} \Pr(Y_{ij} \mid Z)$$
 
-with:
+In particular, the univariate conditional distribution above **only** depends on the latent variables associated to the nodes $i$ and $j$:
 
-$$Y_{ij}\mid(Z_{iq}=1,Z_{j\ell}=1)\sim \text{Bern}(\pi_{q\ell})$$
+$$\Pr(Y_{ij} \mid Z) = \Pr(Y_{ij} \mid Z_i, Z_j)$$
 
-For undirected networks, $\pi_{q\ell}=\pi_{\ell q}$.
+and, to deal with binary networks, this is assumed to correspond to a **conditional Bernoulli distribution**:
 
-### Estimation and Intractability
+$$Y_{ij} \mid (Z_i, Z_j) \sim \text{Bern}(\pi_{q\ell}) \quad \Leftrightarrow \quad Z_{iq} = Z_{j\ell} = 1$$
 
-Denoting $\theta=(\alpha,\pi)$ as the parameters, ML estimation requires:
+That is, $\pi_{q\ell}$ denotes the probability for nodes in block $q$ to be connected with those in block $\ell$. For an undirected network, $\pi_{q\ell} = \pi_{\ell q}$.
 
-$$\hat\theta=\arg\max_\theta \log \Pr(Y;\theta) =\arg\max_\theta \log \sum_z \Pr(Y=y,Z=z;\theta)$$
+### ML Estimation and Intractability
 
-but the sum over all latent configurations $z$ grows prohibitively ($Q^n$ terms).
+Let $\theta = (\alpha_1, \ldots, \alpha_{Q-1}, \pi_{11}, \ldots, \pi_{QQ})'$ denote the vector of model parameters and let $Z = \{Z_{iq}\}$ denote the matrix of all latent variables in the model.
 
-### Variational EM (VEM)
+To derive estimates $\hat{\theta}$, we may rely on a ML approach based on the following maximisation problem:
 
-A variational approximation of the log-likelihood is used:
+$$\hat{\theta} = \arg\max_\theta \ell(\theta) = \arg\max_\theta \log \Pr(Y; \theta)$$
 
-$$F(q(z),\theta)=\ell(\theta)-\mathrm{KL}\big[q(z),p(z\mid y;\theta)\big]$$
+$$= \arg\max_\theta \log \sum_z \Pr(Y = y, Z = z; \theta)$$
 
-A factorisation is imposed:
+$$= \arg\max_\theta \log \sum_z \Pr(Y = y \mid Z = z; \theta) \Pr(Z = z; \theta)$$
 
-$$q(z)=\prod_i h(z_i;\tau_i), \qquad \tau_i=(\tau_{i1},\dots,\tau_{iQ})$$
+where:
+- $z$: realisation of $Z = (Z_1, \ldots, Z_n)'$
+- $\Pr(Y = y \mid Z = z) = \prod_{ij} \Pr(Y_{ij} = y_{ij} \mid Z_i = z_i, Z_j = z_j)$
+- $\Pr(Z = z) = \prod_{i \leq n} \alpha' Z_i$
 
-where $\tau_{iq}$ approximates $\Pr(Z_{iq}=1\mid Y=y)$.
+Solving the above problem requires the evaluation of a multiple summation defined over **all possible configurations** of the latent variables:
 
-The algorithm alternates:
-1. **VE-step**: optimise $F$ with respect to $\tau_i$  
-2. **ME-step**: optimise $F$ with respect to $\alpha$ and $\pi$, with $\tau$ fixed
+$$\sum_{z_1} \cdots \sum_{z_n}$$
 
-until convergence.
+Such a summation becomes **prohibitive** as the size of the network increases ($Q^n$ terms). For a network with 100 nodes and 5 blocks, this means $5^{100} \approx 10^{70}$ terms.
+
+### The EM Algorithm — Why It Fails
+
+As we are dealing with latent variables, the **EM algorithm** could be a possible choice to simplify the estimation process. In this case, instead of directly maximising $\ell(\theta)$, we start from the *complete-data log-likelihood function*:
+
+$$\ell_c(\theta) = \log \Pr(Y = y, Z = z; \theta)$$
+
+and alternate two steps:
+- **E-step**: compute the posterior probability of latent variables, conditional on $y$ and the current estimates: $\Pr(Z = z \mid Y = y; \theta) = p(z \mid y; \theta)$
+- **M-step**: maximise the expected complete-data log-likelihood with respect to model parameters $\theta$
+
+However, performing the E-step **still requires the evaluation of the likelihood function**, which is intractable. An alternative method is needed.
+
+### Variational EM Algorithm (VEM)
+
+We may rely on a **variational approximation** to the log-likelihood. Instead of maximising the observed-data log-likelihood, we maximise a *computationally tractable lower bound* (auxiliary function):
+
+$$F(q(z), \theta) = \ell(\theta) - \mathrm{KL}[q(z), p(z \mid y; \theta)]$$
+
+where $\mathrm{KL}$ is the **Kullback-Leibler divergence** between the true intractable posterior $p(z \mid y; \theta)$ and its approximation $q(z)$.
+
+We constrain $q(z)$ to have the following factorised form:
+
+$$q(z) = \prod_i h(z_i; \tau_i)$$
+
+where $h(z_i; \tau_i)$ denotes the **Multinomial distribution** with parameters 1 and $\tau_i = (\tau_{i1}, \ldots, \tau_{iQ})$.
+
+That is, we approximate the intractable posterior distribution $p(z \mid y; \theta)$ by assuming **independence a posteriori** between latent variables $Z_i$'s. Therefore, the quantity $\tau_{iq}$ can be directly considered as an approximation of $\Pr(Z_{iq} = 1 \mid Y = y)$.
+
+The VE algorithm alternates two separate steps:
+
+1. **VE-step**: we maximise $F(q(z), \theta)$ with respect to $q(z)$. That is, we maximise $F(q(z), \theta)$ with respect to the $\tau_i$ parameters (keeping constant the remaining model parameters)
+
+2. **ME-step**: we maximise $F(q(z), \theta)$ with respect to $\alpha_q$, $q = 1, \ldots, Q$ and $\pi_{q\ell}$, $q, \ell = 1, \ldots, Q$ (keeping constant $\tau_i$, $i = 1, \ldots, n$ to the current estimates)
+
+Starting from some initial values for $\tau_i^{(0)}$, the VE-step and ME-step are alternated until **convergence** of the algorithm. That is, until the difference between two subsequent values of the auxiliary function $F(q, \theta)$ is lower than a fixed small quantity $\epsilon$:
+
+$$F(\hat{q}^{(k)}, \theta^{(k)}) - F(\hat{q}^{(k-1)}, \theta^{(k-1)}) < \epsilon$$
 
 ### Block Assignment
 
