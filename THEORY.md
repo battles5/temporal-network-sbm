@@ -8,6 +8,7 @@ This document summarises the mathematical foundations used in the toolkit, follo
 
 ## Table of Contents
 
+0. [Introduction: Statistical Modelling of Networks](#0-introduction-statistical-modelling-of-networks)
 1. [Basic Notation](#basic-notation)
 2. [Global Statistics: Density, Reciprocity, Transitivity](#1-global-statistics-density-reciprocity-transitivity)
 3. [Node Centrality and Network Centralisation](#2-node-centrality-and-network-centralisation)
@@ -16,6 +17,80 @@ This document summarises the mathematical foundations used in the toolkit, follo
 6. [Assortativity Coefficient](#assortativity-coefficient)
 7. [Temporal Extension (Dynamic SBM)](#5-temporal-extension-dynamic-sbm--project-extension)
 8. [Hypergraph Group Extraction via Cliques](#6-hypergraph-group-extraction-via-cliques)
+
+---
+
+## 0. Introduction: Statistical Modelling of Networks
+
+### Why Statistical Models for Networks?
+
+Network data are characterised by a number of **dependencies** which have been found both empirically and theoretically:
+- **Reciprocation**: if $i$ connects to $j$, does $j$ connect back to $i$?
+- **Homophily**: do similar nodes tend to connect?
+- **Transitivity**: are friends of friends also friends?
+- **Degree variability**: are some nodes more connected than others?
+
+Under a statistical modelling approach, the observed network is considered as *an outcome of a random draw from the postulated model*. It is natural to consider that the observed network data could have been different — different nodes, different timing, different external influences. However, in such a "population" of different networks, systematic patterns captured by the model parameters would remain the same.
+
+The aim of the statistical model is to represent the main features of the network via a small number of parameters. Expressing the uncertainty of those estimates gives an indication of how different estimates might be if the researcher had observed a different network from the "population".
+
+### Three Broad Approaches
+
+The literature distinguishes three broad approaches to account for network dependencies:
+
+| Approach | Description | Key Idea |
+|----------|-------------|----------|
+| **Incorporating network structure through covariates** | A statistical model for independent data is considered; network dependencies are represented by including them as explanatory variables | Used mainly in longitudinal settings where earlier observations produce covariates (Gulati & Gargiulo, 1999) |
+| **Controlling for network dependencies** | Network dependencies are considered by specifying a covariance structure but are not explicitly modelled | E.g., Lindgren (2010) |
+| **Modelling network structure** | Structural dependencies between tie variables $Y_{ij}$ are explicitly modelled; a potentially large number of parameters is included | The observed network is a random draw from the postulated model |
+
+This toolkit focuses on the **third approach**: explicitly modelling network structure.
+
+### Modelling Alternatives: A Historical Overview
+
+Different statistical models have been developed in the literature to express network dependencies:
+
+#### 1. Conditionally Uniform Models (Holland & Leinhardt, 1976)
+
+- Network properties that researchers wish to control for are summarised by means of proper network statistics
+- It is assumed that, conditional on these statistics, the distribution of the network is **uniform**
+- Each network satisfying the constraints has the same probability; all others have probability zero
+- Holland & Leinhardt considered conditioning statistics from the **dyad census** (mutual, asymmetric, null dyads)
+- Snijders (1991) extended this to in- and out-degree distributions
+- **Limitation**: These models become very complicated when more elaborate properties and richer conditioning statistics are considered; they are not widely used today
+
+#### 2. Latent Space Models
+
+These models assume the existence of **latent (unobserved) variables**, such that the observed variables have a simple probability distribution given the latent variables.
+
+- The specification of the latent variables' distribution identifies the **structural model**
+- The distribution of the observed variables, conditional on the latent ones, identifies the **measurement model**
+
+Two main types:
+
+| Type | Description | Key References |
+|------|-------------|----------------|
+| **Discrete Latent Space Models** | Node-level latent variables indicate block membership; conditional on them, tie variables are independent | Holland et al. (1983), Nowicki & Snijders (2001), Daudin et al. (2008), Airoldi et al. (2008) |
+| **Distance Latent Space Models** | Nodes are projected in a low-dimensional latent space (2–3 dimensions); the probability of a tie decreases with distance in this space | Hoff et al. (2002) |
+
+**Stochastic Block Models (SBMs)** are the most prominent example of discrete latent space models. The **Mixed Membership Model** (Airoldi et al., 2008) extends SBMs by allowing each node to belong to multiple clusters, describing situations where nodes play multiple roles.
+
+#### 3. Exponential Random Graph Models (ERGMs)
+
+- Rather than conditioning on latent variables, the dependence between tie variables is **explicitly modelled**
+- The probability of observing the network is directly modelled as a function of given network statistics (sufficient statistics)
+- These statistics are defined to capture dependencies between tie variables (e.g., triangles, two-stars)
+- Key reference: Frank & Strauss (1986)
+
+### Why This Toolkit Focuses on SBMs
+
+This toolkit implements **Stochastic Block Models** as the primary method for community detection because:
+
+1. **Principled inference**: SBMs provide a generative probabilistic framework with well-defined likelihood
+2. **Model selection**: The number of blocks can be selected via principled criteria (ICL, MDL)
+3. **Interpretability**: Block membership has clear interpretation as latent community structure
+4. **Flexibility**: SBMs can detect assortative, disassortative, and core-periphery structures
+5. **Uncertainty quantification**: Posterior probabilities provide uncertainty estimates for block assignments
 
 ---
 

@@ -511,7 +511,7 @@ The SBM identifies **18 blocks**, which is more than the 11 actual school classe
 
 ![Block Connection Matrix](docs/sbm_block_matrix.png)
 
-*Figure: Connection Probability Matrix $\hat{\Pi}$, where $\hat{\pi}_{q\ell}$ represents the estimated probability of an edge between a node in block $q$ and a node in block $\ell$.*
+**Figure: Connection Probability Matrix Π̂.** Each cell π̂_qℓ represents the estimated probability of an edge between a node in block q and a node in block ℓ.
 
 The block connection matrix shows:
 - **Strong diagonal** (assortative structure): students primarily interact within their class
@@ -544,7 +544,7 @@ The Dynamic SBM analyses how community structure evolves over time by fitting in
 
 ![Dynamic SBM Evolution](docs/dynamic_sbm_evolution.png)
 
-*Figure: Block Size Heatmap showing the number of nodes in each block (rows) across time windows (columns). Darker cells indicate larger blocks; white cells indicate absent blocks.*
+**Figure: Block Size Heatmap.** Number of nodes in each block (rows) across time windows (columns). Darker cells indicate larger blocks; white cells indicate absent blocks.
 
 **Interpretation notes:**
 - Each row represents a block label (0, 1, 2, ...) as assigned after Hungarian algorithm alignment
@@ -556,7 +556,7 @@ The Dynamic SBM analyses how community structure evolves over time by fitting in
 
 ![Dynamic SBM Transitions](docs/dynamic_sbm_transitions.png)
 
-*Figure: Transition Probability Matrix $\hat{P}$, where $\hat{p}_{rs} = P(b_{t+1}=s \mid b_t=r)$ represents the estimated probability that a node moves from block $r$ at time $t$ to block $s$ at time $t+1$.*
+**Figure: Transition Probability Matrix P̂.** Each cell p̂_rs = P(b_{t+1}=s | b_t=r) represents the estimated probability that a node moves from block r at time t to block s at time t+1.
 
 The transition matrix shows block-to-block movement probabilities. Key observations:
 - **Diagonal dominance**: nodes tend to stay in their blocks (stable class membership)
@@ -582,7 +582,7 @@ python main.py --input data/tij_LyonSchool.dat --output output/ --hypergraph
 
 ![Group Size Distribution](docs/group_size_distribution.png)
 
-*Figure: Distribution of group sizes extracted via clique enumeration. Left: linear scale; Right: log scale.*
+**Figure: Distribution of group sizes** extracted via clique enumeration. Left: linear scale; Right: log scale.
 
 | Hypergraph Metric | Value |
 |-------------------|-------|
@@ -596,7 +596,7 @@ The group size distribution typically follows a **power-law-like decay**: many s
 
 ![Group Size Over Time](docs/group_size_over_time.png)
 
-*Figure: Median group size per time window with interquartile range (IQR). The pattern mirrors overall activity — larger groups form during peak school hours.*
+**Figure: Median group size per time window** with interquartile range (IQR). The pattern mirrors overall activity — larger groups form during peak school hours.
 
 ---
 
