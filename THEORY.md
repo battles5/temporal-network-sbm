@@ -317,13 +317,23 @@ At convergence, node $i$ is assigned to the most probable block:
 
 $$\hat{q}_i = \arg\max_q \hat\tau_{iq}$$
 
+**Clustering of nodes** is a crucial aspect in this framework. How can we assign nodes to one of the $Q$ distinct blocks? In model-based clustering, typically, statistical units are assigned to the mixture component characterised by the **highest posterior probability**. As posteriors are not available when dealing with SBM (they are intractable), we rely on their approximation $\tau_{iq}$.
+
+That is, we assign node $i$ to one of the $Q$ blocks by solving:
+
+$$\arg\max_q \hat{\tau}_{iq}, \quad i = 1, \ldots, n$$
+
+where $\hat{\tau}_{iq}$ is the approximation to $\Pr(Z_{iq} = 1 \mid Y = y)$ obtained at convergence of the VEM algorithm.
+
 ### Model Selection (ICL)
 
-The number of blocks $Q$ can be selected via the **Integrated Classification Likelihood**. In the course slides, the ICL is presented as:
+The **number of blocks $Q$ is unknown** and should be estimated along with the remaining model parameters. Typically, $Q$ is treated as known and estimated via **model selection techniques** through penalised likelihood criteria.
+
+In this framework, the likelihood is not available in closed form expression, so that an approximate approach is considered. This is based on the **Integrated Classification Likelihood (ICL)**:
 
 $$ICL = \log p(y, \tilde{z})$$
 
-where $\tilde{z}$ is the MAP (maximum a posteriori) assignment of nodes to blocks. The number $Q$ is chosen to maximise this criterion.
+where $\tilde{z}$ denotes the predicted $Z$ (the MAP assignment of nodes to blocks). The optimal number of latent blocks $Q$ is the one corresponding to the **maximum value of ICL**.
 
 In practice, a **BIC-like penalised version** is often used to avoid overfitting:
 
@@ -337,9 +347,15 @@ where the penalty terms correct for the number of free parameters in $\alpha$ (b
 
 ### Extensions to Valued Networks
 
-For non-binary relationships:
-- (real-valued) $Y_{ij}\mid(Z_{iq}=1,Z_{j\ell}=1)\sim \mathcal{N}(\mu_{q\ell},\sigma_{q\ell})$
-- (count) $Y_{ij}\mid(Z_{iq}=1,Z_{j\ell}=1)\sim \mathrm{Pois}(\lambda_{q\ell})$
+The SBM described so far may be extended to deal with **valued relations**. Random variables $Y_{ij}$ are still assumed to be conditionally independent, given the latent variables of nodes involved in the relation. However, rather than considering a conditional Bernoulli distribution, we may have:
+
+| Network Type | Distribution | Parameters |
+|--------------|--------------|------------|
+| **Binary** | $Y_{ij} \mid Z_{iq}=1, Z_{j\ell}=1 \sim \text{Bern}(\pi_{q\ell})$ | $\pi_{q\ell}$ = connection probability |
+| **Real-valued** | $Y_{ij} \mid Z_{iq}=1, Z_{j\ell}=1 \sim \mathcal{N}(\mu_{q\ell}, \sigma_{q\ell})$ | $\mu_{q\ell}$ = mean, $\sigma_{q\ell}$ = std |
+| **Count data** | $Y_{ij} \mid Z_{iq}=1, Z_{j\ell}=1 \sim \text{Pois}(\lambda_{q\ell})$ | $\lambda_{q\ell}$ = rate |
+
+Further distributions may be adopted depending on the nature of the edge weights.
 
 ---
 
