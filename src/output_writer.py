@@ -38,6 +38,12 @@ def write_metrics_csv(
         all_metrics['sbm_description_length'] = sbm_results.get('description_length', 0)
         if 'icl' in sbm_results:
             all_metrics['sbm_icl'] = sbm_results.get('icl', 0)
+        if 'modularity' in sbm_results:
+            all_metrics['sbm_modularity'] = sbm_results.get('modularity', 0)
+        if 'modularity_max' in sbm_results:
+            all_metrics['sbm_modularity_max'] = sbm_results.get('modularity_max', 0)
+        if 'assortativity_coefficient' in sbm_results:
+            all_metrics['sbm_assortativity_coefficient'] = sbm_results.get('assortativity_coefficient', 0)
     
     with open(output_path, 'w', newline='') as f:
         writer = csv.writer(f)
@@ -223,6 +229,12 @@ def write_summary(
         lines.append(f"Description length (MDL): {sbm_results['description_length']:.2f}")
         if 'icl' in sbm_results:
             lines.append(f"ICL (Integrated Classification Likelihood): {sbm_results['icl']:.2f}")
+        if 'modularity' in sbm_results:
+            lines.append(f"Modularity Q: {sbm_results['modularity']:.4f}")
+        if 'modularity_max' in sbm_results:
+            lines.append(f"Modularity Qmax: {sbm_results['modularity_max']:.4f}")
+        if 'assortativity_coefficient' in sbm_results:
+            lines.append(f"Assortativity coefficient (Q/Qmax): {sbm_results['assortativity_coefficient']:.4f}")
         lines.append("Block sizes:")
         for block, size in sorted(sbm_results['block_sizes'].items()):
             density = sbm_results.get('block_densities', {}).get(block, 0)

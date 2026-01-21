@@ -294,6 +294,92 @@ def compute_icl(
     return round(icl, 2)
 
 
+def compute_modularity(
+    g: Graph,
+    block_assignment: np.ndarray
+) -> Tuple[float, float, float]:
+    """
+    Compute modularity Q and assortativity coefficient (Q/Qmax).
+    
+    Modularity measures the fraction of edges within communities minus the
+    expected fraction under a null model (configuration model).
+    
+    Q = (1/2m) * sum_ij [ Y_ij - (k_i * k_j)/(2m) ] * delta(c_i, c_j)
+    
+    The assortativity coefficient normalizes Q by Qmax to get a value in [-1, 1]:
+    - r = 1: perfect assortative mixing (all edges within communities)
+    - r = 0: random mixing
+    - r = -1: perfect disassortative mixing (all edges between communities)
+    
+    Parameters
+    ----------
+    g : Graph
+        The input graph
+    block_assignment : np.ndarray
+        Block assignment for each node
+        
+    Returns
+    -------
+    Q : float
+        Modularity value
+    Qmax : float
+        Maximum possible modularity for this partition
+    assortativity : float
+        Assortativity coefficient Q/Qmax in [-1, 1]
+    """
+    n = g.num_vertices()
+    m = g.num_edges()
+    
+    if m == 0:
+        return 0.0, 0.0, 0.0
+    
+    # Get degrees
+    degrees = g.get_out_degrees(g.get_vertices())
+    
+    # Map blocks to consecutive indices
+    unique_blocks = np.unique(block_assignment)
+    block_map = {b: i for i, b in enumerate(unique_blocks)}
+    z = np.array([block_map[b] for b in block_assignment])
+    Q_blocks = len(unique_blocks)
+    
+    # Compute e_qq (fraction of edges within each block)
+    # and a_q (fraction of edge endpoints in each block)
+    e_within = np.zeros(Q_blocks)  # edges within block q
+    a_q = np.zeros(Q_blocks)  # sum of degrees in block q / 2m
+    
+    for v in g.vertices():
+        v_idx = int(v)
+        q = z[v_idx]
+        a_q[q] += degrees[v_idx]
+    
+    a_q = a_q / (2 * m)  # Normalize to fraction of edge endpoints
+    
+    # Count edges within blocks
+    for edge in g.edges():
+        i, j = int(edge.source()), int(edge.target())
+        if z[i] == z[j]:
+            e_within[z[i]] += 1
+    
+    # e_qq as fraction of total edges
+    e_qq = e_within / m
+    
+    # Modularity: Q = sum_q (e_qq - a_q^2)
+    Q = np.sum(e_qq - a_q**2)
+    
+    # Qmax: maximum modularity for this partition
+    # Qmax = 1 - sum_q (a_q^2)
+    # This is the modularity when all edges are within communities
+    Qmax = 1 - np.sum(a_q**2)
+    
+    # Assortativity coefficient (normalized modularity)
+    if Qmax > 0:
+        assortativity = Q / Qmax
+    else:
+        assortativity = 0.0
+    
+    return round(Q, 4), round(Qmax, 4), round(assortativity, 4)
+
+
 def run_sbm_analysis(
     g: Graph,
     node_list: List[int],
@@ -322,6 +408,15 @@ def run_sbm_analysis(
     icl = compute_icl(g, results['block_assignment'])
     results['icl'] = icl
     print(f"  ICL: {icl}")
+    
+    # Compute Modularity and Assortativity Coefficient
+    Q, Qmax, assortativity = compute_modularity(g, results['block_assignment'])
+    results['modularity'] = Q
+    results['modularity_max'] = Qmax
+    results['assortativity_coefficient'] = assortativity
+    print(f"  Modularity Q: {Q}")
+    print(f"  Modularity Qmax: {Qmax}")
+    print(f"  Assortativity coefficient (Q/Qmax): {assortativity}")
     
     # Generate summary
     block_summary = get_sbm_summary(results, node_list)

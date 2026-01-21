@@ -447,8 +447,27 @@ The SBM infers the latent community structure using Bayesian inference with the 
 | **Optimal number of blocks** | 18 |
 | **Description Length (MDL)** | 15,827.51 bits |
 | **ICL** | -11,510.71 |
+| **Modularity Q** | 0.1247 |
+| **Modularity Q_max** | 0.9306 |
+| **Assortativity Coefficient (Q/Q_max)** | 0.134 |
 
 > **Note**: The toolkit computes both MDL (from `graph-tool`) and ICL (following course notation). MDL is used for model selection during inference; ICL is reported for comparison with the course material.
+
+##### Modularity and Assortativity
+
+The **modularity** $Q$ measures the fraction of edges within communities compared to the expected fraction under a null model:
+
+$$Q = \frac{1}{2m}\sum_{ij}\left(Y_{ij} - \frac{k_i k_j}{2m}\right)\delta(c_i, c_j)$$
+
+The **assortativity coefficient** normalizes $Q$ by its maximum value $Q_{max}$ to give a value in $[-1, 1]$:
+
+$$r = \frac{Q}{Q_{max}}$$
+
+- $r = 1$: perfect assortative mixing (all edges within communities)
+- $r = 0$: random mixing
+- $r < 0$: disassortative mixing
+
+Our result ($r = 0.134$) indicates **weak assortative mixing**, which is expected: while students primarily interact within their class (captured by the SBM blocks), there is significant inter-class interaction during breaks and lunch.
 
 ##### Block Sizes and Densities
 
@@ -835,6 +854,22 @@ The SBM can detect:
 - **Assortative structure**: nodes connect within their block (communities)
 - **Disassortative structure**: nodes connect between blocks (bipartite-like)
 - **Core-periphery**: central blocks connect to all, peripheral blocks connect only to core
+
+#### Assortativity Coefficient (Normalized Modularity)
+
+Following the course notation, modularity $Q$ can be normalized to obtain the **assortativity coefficient**:
+
+$$r = \frac{Q}{Q_{max}}$$
+
+where $Q_{max} = 1 - \sum_q a_q^2$ is the maximum modularity achievable (when all edges are within communities), and $a_q$ is the fraction of edge endpoints in block $q$.
+
+The assortativity coefficient $r$ has a cleaner interpretation:
+- $r \in [-1, 1]$
+- $r = 1$: perfect assortative mixing
+- $r = 0$: random mixing (no community structure)
+- $r = -1$: perfect disassortative mixing
+
+> **Implementation note**: The toolkit computes both raw modularity $Q$ and the assortativity coefficient $r = Q/Q_{max}$ for the SBM partition.
 
 ---
 
